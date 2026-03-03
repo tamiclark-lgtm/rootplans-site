@@ -60,10 +60,20 @@
 <script>
 // Load full ZIP -> Zone JSON
 let zipToZone = {};
-fetch("zip_to_zone.json") // Must exist in repo root
-  .then(response => response.json())
-  .then(data => zipToZone = data)
-  .catch(err => alert("Error loading ZIP to Zone data: " + err));
+
+async function loadZipJSON() {
+  try {
+    const response = await fetch("zip_to_zone.json");
+    if (!response.ok) throw new Error("zip_to_zone.json not found or not accessible.");
+    zipToZone = await response.json();
+  } catch (err) {
+    alert("Error loading ZIP to Zone data: " + err);
+    zipToZone = {}; // fallback to empty object
+  }
+}
+
+// Call immediately
+loadZipJSON();
 
 const csvURL = "rootplans_master_database.csv"; // hosted in repo root
 let userZone = null;
