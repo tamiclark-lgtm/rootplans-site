@@ -30,7 +30,6 @@ header {
 }
 
 h1 { margin: 0; }
-h2 { margin-top: 0; }
 
 input, select, button {
   padding: 10px;
@@ -56,15 +55,8 @@ button:hover {
   background: #244a28;
 }
 
-.success {
-  color: green;
-  font-weight: 600;
-}
-
-.error {
-  color: red;
-  font-weight: 600;
-}
+.success { color: green; font-weight: 600; }
+.error { color: red; font-weight: 600; }
 
 table {
   width: 100%;
@@ -78,9 +70,7 @@ th, td {
   text-align: left;
 }
 
-th {
-  background: #f0f4ef;
-}
+th { background: #f0f4ef; }
 </style>
 </head>
 <body>
@@ -143,7 +133,7 @@ let userZone = null;
 let plantsData = [];
 let filteredPlants = [];
 
-/* STEP 1: Detect ZIP → Lat/Long → USDA Zone */
+/* ZIP → Temperature → USDA Zone */
 async function detectZone() {
   const zip = document.getElementById("zip").value.trim();
   const message = document.getElementById("zoneMessage");
@@ -154,7 +144,7 @@ async function detectZone() {
   }
 
   try {
-    // Get latitude & longitude from ZIP
+    // Step 1: Get lat/long from ZIP
     const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
     if (!zipRes.ok) throw new Error("ZIP not found.");
 
@@ -162,28 +152,47 @@ async function detectZone() {
     const lat = zipData.places[0].latitude;
     const lon = zipData.places[0].longitude;
 
-    // Get USDA zone using open USDA map API
-    const zoneRes = await fetch(
-      `https://phzmapi.azurewebsites.net/api/PlantHardinessZone?lat=${lat}&long=${lon}`
+    // Step 2: Get past year minimum temps
+    const weatherRes = await fetch(
+      `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=2024-01-01&end_date=2024-12-31&daily=temperature_2m_min&timezone=auto`
     );
 
-    if (!zoneRes.ok) throw new Error("Zone lookup failed.");
+    if (!weatherRes.ok) throw new Error("Weather lookup failed.");
 
-    const zoneData = await zoneRes.json();
-    userZone = zoneData.zone;
+    const weatherData = await weatherRes.json();
+    const minTemps = weatherData.daily.temperature_2m_min;
+
+    const absoluteMinC = Math.min(...minTemps);
+    userZone = convertTempToZone(absoluteMinC);
 
     message.innerHTML = `<span class='success'>Your USDA Zone is ${userZone}</span>`;
-
     document.getElementById("preferences").style.display = "block";
 
     loadCSV();
 
   } catch (err) {
-    message.innerHTML = `<span class='error'>Unable to detect zone.</span>`;
+    message.innerHTML = "<span class='error'>Unable to detect zone.</span>";
   }
 }
 
-/* STEP 2: Load Plant Database */
+/* Convert Minimum Temp (°C) → USDA Zone */
+function convertTempToZone(tempC) {
+  const tempF = (tempC * 9/5) + 32;
+
+  if (tempF <= -50) return "1";
+  if (tempF <= -40) return "2";
+  if (tempF <= -30) return "3";
+  if (tempF <= -20) return "4";
+  if (tempF <= -10) return "5";
+  if (tempF <= 0) return "6";
+  if (tempF <= 10) return "7";
+  if (tempF <= 20) return "8";
+  if (tempF <= 30) return "9";
+  if (tempF <= 40) return "10";
+  return "11";
+}
+
+/* Load Plant CSV */
 function loadCSV() {
   Papa.parse("rootplans_master_database.csv", {
     download: true,
@@ -194,7 +203,7 @@ function loadCSV() {
   });
 }
 
-/* STEP 3: Smarter Filtering Logic */
+/* Filter Plants */
 function generatePlan() {
 
   const pollinatorOnly = document.getElementById("pollinator").checked;
@@ -214,7 +223,6 @@ function generatePlan() {
     return true;
   });
 
-  // Basic size logic (limit results)
   if (size === "small") filteredPlants = filteredPlants.slice(0, 6);
   if (size === "medium") filteredPlants = filteredPlants.slice(0, 12);
   if (size === "large") filteredPlants = filteredPlants.slice(0, 20);
@@ -222,7 +230,7 @@ function generatePlan() {
   displayPlants();
 }
 
-/* STEP 4: Display Table */
+/* Display Results */
 function displayPlants() {
   const table = document.getElementById("plantsTable");
   const tbody = table.querySelector("tbody");
@@ -243,7 +251,7 @@ function displayPlants() {
   document.getElementById("downloadBtn").style.display = "inline-block";
 }
 
-/* STEP 5: Download CSV */
+/* Download CSV */
 function downloadCSV() {
   const csv = Papa.unparse(filteredPlants);
   const blob = new Blob([csv], { type: "text/csv" });
