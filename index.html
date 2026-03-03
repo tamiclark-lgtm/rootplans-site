@@ -89,6 +89,17 @@ button:hover {
   background: #f0f6f2;
 }
 
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.checkbox-row input {
+  width: auto;
+}
+
 .success { color: green; font-weight: 600; }
 .error { color: red; font-weight: 600; }
 
@@ -156,7 +167,7 @@ th {
     <option value="large">Large (200+ sq ft)</option>
   </select>
 
-  <div style="margin-top:15px;">
+  <div class="checkbox-row">
     <input type="checkbox" id="pollinator">
     <label for="pollinator">Prioritize Pollinator-Friendly Plants</label>
   </div>
@@ -234,20 +245,21 @@ function convertTempToZone(tempC) {
 /* Theme Selection */
 function selectTheme(theme, element) {
   selectedTheme = theme;
-
-  document.querySelectorAll(".theme-card")
-    .forEach(card => card.classList.remove("selected"));
-
+  document.querySelectorAll(".theme-card").forEach(card => card.classList.remove("selected"));
   element.classList.add("selected");
 }
 
-/* Load CSV */
+/* Load CSV from GitHub Pages */
 function loadCSV() {
+  // Must be in the same repo root or in /data folder
   Papa.parse("rootplans_master_database.csv", {
     download: true,
     header: true,
     complete: function(results) {
       plantsData = results.data;
+    },
+    error: function(err) {
+      alert("Error loading CSV: " + err);
     }
   });
 }
@@ -261,20 +273,13 @@ function generatePlan() {
   }
 
   let filtered = plantsData.filter(p => {
-
     if (!p["USDA Zone"]) return false;
-
     const zones = p["USDA Zone"].split(",");
     if (!zones.includes(userZone)) return false;
 
-    if (selectedTheme === "functional" && p["Theme"] !== "Functional")
-      return false;
-
-    if (selectedTheme === "holistic" && p["Theme"] !== "Holistic")
-      return false;
-
-    if (selectedTheme === "traditional" && p["Theme"] !== "Traditional")
-      return false;
+    if (selectedTheme === "functional" && p["Theme"] !== "Functional") return false;
+    if (selectedTheme === "holistic" && p["Theme"] !== "Holistic") return false;
+    if (selectedTheme === "traditional" && p["Theme"] !== "Traditional") return false;
 
     return true;
   });
