@@ -2,44 +2,55 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>RootPlans | Smart Garden Builder</title>
+<title>RootPlans | Intelligent Garden Design</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
-  background: #f4f7f2;
-  color: #2d3a2d;
+  background: #f6f8f5;
+  color: #2c3e2f;
 }
 
 header {
-  background: #2f5d34;
+  background: linear-gradient(135deg, #2f5d34, #4e8b54);
   color: white;
-  padding: 30px 20px;
+  padding: 60px 20px;
   text-align: center;
 }
 
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  background: white;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+header h1 {
+  font-size: 42px;
+  margin: 0;
 }
 
-h1 { margin: 0; }
+header p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 40px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+}
+
+.section {
+  margin-bottom: 40px;
+}
 
 input, select, button {
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
-  margin: 8px 0;
+  border-radius: 8px;
 }
 
 input, select {
   width: 100%;
-  border-radius: 6px;
   border: 1px solid #ccc;
 }
 
@@ -47,12 +58,35 @@ button {
   background: #2f5d34;
   color: white;
   border: none;
-  border-radius: 6px;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 button:hover {
-  background: #244a28;
+  background: #254a29;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.theme-card {
+  border: 2px solid #e4e8e2;
+  padding: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.theme-card:hover {
+  border-color: #2f5d34;
+}
+
+.theme-card.selected {
+  border-color: #2f5d34;
+  background: #f0f6f2;
 }
 
 .success { color: green; font-weight: 600; }
@@ -67,45 +101,68 @@ table {
 th, td {
   padding: 12px;
   border-bottom: 1px solid #eee;
-  text-align: left;
 }
 
-th { background: #f0f4ef; }
+th {
+  background: #f2f5f1;
+  text-align: left;
+}
 </style>
 </head>
 <body>
 
 <header>
   <h1>🌱 RootPlans</h1>
-  <p>Build a garden tailored to your USDA Hardiness Zone</p>
+  <p>Intelligent Garden Plans Based on Your Climate & Goals</p>
 </header>
 
 <div class="container">
 
-<h2>Step 1: Enter Your ZIP Code</h2>
-
-<input type="text" id="zip" placeholder="Enter 5-digit US ZIP">
-<button onclick="detectZone()">Detect My Zone</button>
-
-<p id="zoneMessage"></p>
+<div class="section">
+  <h2>1️⃣ Enter Your ZIP Code</h2>
+  <input type="text" id="zip" placeholder="Enter 5-digit US ZIP">
+  <button onclick="detectZone()">Detect My Zone</button>
+  <p id="zoneMessage"></p>
+</div>
 
 <div id="preferences" style="display:none;">
 
-<h2>Step 2: Customize Your Garden</h2>
+<div class="section">
+  <h2>2️⃣ Choose Your Garden Philosophy</h2>
 
-<label>Garden Size</label>
-<select id="size">
-  <option value="small">Small (1–50 sq ft)</option>
-  <option value="medium">Medium (50–200 sq ft)</option>
-  <option value="large">Large (200+ sq ft)</option>
-</select>
+  <div class="theme-grid">
+    <div class="theme-card" onclick="selectTheme('functional', this)">
+      <h3>🌿 Functional Food</h3>
+      <p>Plants selected to support health and specific conditions.</p>
+    </div>
 
-<label>
-  <input type="checkbox" id="pollinator">
-  Prioritize Pollinator-Friendly Plants
-</label>
+    <div class="theme-card" onclick="selectTheme('holistic', this)">
+      <h3>🌎 Holistic / Regenerative</h3>
+      <p>Soil-first, ecosystem-driven, biodiversity-focused planning.</p>
+    </div>
 
-<button onclick="generatePlan()">Generate My Garden Plan</button>
+    <div class="theme-card" onclick="selectTheme('traditional', this)">
+      <h3>🏡 Traditional Gardener</h3>
+      <p>Classic vegetables, herbs, and flowers for home gardeners.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>3️⃣ Garden Size</h2>
+  <select id="size">
+    <option value="small">Small (1–50 sq ft)</option>
+    <option value="medium">Medium (50–200 sq ft)</option>
+    <option value="large">Large (200+ sq ft)</option>
+  </select>
+
+  <div style="margin-top:15px;">
+    <input type="checkbox" id="pollinator">
+    <label for="pollinator">Prioritize Pollinator-Friendly Plants</label>
+  </div>
+
+  <button onclick="generatePlan()">Generate My Garden Plan</button>
+</div>
 
 </div>
 
@@ -115,13 +172,10 @@ th { background: #f0f4ef; }
       <th>Plant</th>
       <th>Category</th>
       <th>Zone</th>
-      <th>Pollinator</th>
     </tr>
   </thead>
   <tbody></tbody>
 </table>
-
-<button id="downloadBtn" style="display:none;" onclick="downloadCSV()">Download My Plan</button>
 
 </div>
 
@@ -131,68 +185,63 @@ th { background: #f0f4ef; }
 
 let userZone = null;
 let plantsData = [];
-let filteredPlants = [];
+let selectedTheme = null;
 
-/* ZIP → Temperature → USDA Zone */
+/* ZIP → Zone */
 async function detectZone() {
   const zip = document.getElementById("zip").value.trim();
   const message = document.getElementById("zoneMessage");
 
   if (!/^\d{5}$/.test(zip)) {
-    message.innerHTML = "<span class='error'>Enter a valid 5-digit ZIP.</span>";
+    message.innerHTML = "<span class='error'>Enter a valid ZIP.</span>";
     return;
   }
 
   try {
-    // Step 1: Get lat/long from ZIP
     const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
-    if (!zipRes.ok) throw new Error("ZIP not found.");
-
     const zipData = await zipRes.json();
     const lat = zipData.places[0].latitude;
     const lon = zipData.places[0].longitude;
 
-    // Step 2: Get past year minimum temps
     const weatherRes = await fetch(
       `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=2024-01-01&end_date=2024-12-31&daily=temperature_2m_min&timezone=auto`
     );
 
-    if (!weatherRes.ok) throw new Error("Weather lookup failed.");
-
     const weatherData = await weatherRes.json();
-    const minTemps = weatherData.daily.temperature_2m_min;
+    const absoluteMin = Math.min(...weatherData.daily.temperature_2m_min);
+    userZone = convertTempToZone(absoluteMin);
 
-    const absoluteMinC = Math.min(...minTemps);
-    userZone = convertTempToZone(absoluteMinC);
-
-    message.innerHTML = `<span class='success'>Your USDA Zone is ${userZone}</span>`;
+    message.innerHTML = `<span class='success'>USDA Zone ${userZone}</span>`;
     document.getElementById("preferences").style.display = "block";
 
     loadCSV();
 
-  } catch (err) {
+  } catch {
     message.innerHTML = "<span class='error'>Unable to detect zone.</span>";
   }
 }
 
-/* Convert Minimum Temp (°C) → USDA Zone */
 function convertTempToZone(tempC) {
   const tempF = (tempC * 9/5) + 32;
-
-  if (tempF <= -50) return "1";
-  if (tempF <= -40) return "2";
-  if (tempF <= -30) return "3";
-  if (tempF <= -20) return "4";
   if (tempF <= -10) return "5";
   if (tempF <= 0) return "6";
   if (tempF <= 10) return "7";
   if (tempF <= 20) return "8";
   if (tempF <= 30) return "9";
-  if (tempF <= 40) return "10";
-  return "11";
+  return "10";
 }
 
-/* Load Plant CSV */
+/* Theme Selection */
+function selectTheme(theme, element) {
+  selectedTheme = theme;
+
+  document.querySelectorAll(".theme-card")
+    .forEach(card => card.classList.remove("selected"));
+
+  element.classList.add("selected");
+}
+
+/* Load CSV */
 function loadCSV() {
   Papa.parse("rootplans_master_database.csv", {
     download: true,
@@ -203,62 +252,52 @@ function loadCSV() {
   });
 }
 
-/* Filter Plants */
+/* Generate Plan */
 function generatePlan() {
 
-  const pollinatorOnly = document.getElementById("pollinator").checked;
-  const size = document.getElementById("size").value;
+  if (!selectedTheme) {
+    alert("Please select a garden philosophy.");
+    return;
+  }
 
-  filteredPlants = plantsData.filter(p => {
+  let filtered = plantsData.filter(p => {
 
     if (!p["USDA Zone"]) return false;
 
-    const zones = p["USDA Zone"].split(",").map(z => z.trim());
-
+    const zones = p["USDA Zone"].split(",");
     if (!zones.includes(userZone)) return false;
 
-    if (pollinatorOnly && p["Pollinator Friendly"] !== "Yes")
+    if (selectedTheme === "functional" && p["Theme"] !== "Functional")
+      return false;
+
+    if (selectedTheme === "holistic" && p["Theme"] !== "Holistic")
+      return false;
+
+    if (selectedTheme === "traditional" && p["Theme"] !== "Traditional")
       return false;
 
     return true;
   });
 
-  if (size === "small") filteredPlants = filteredPlants.slice(0, 6);
-  if (size === "medium") filteredPlants = filteredPlants.slice(0, 12);
-  if (size === "large") filteredPlants = filteredPlants.slice(0, 20);
-
-  displayPlants();
+  displayPlants(filtered);
 }
 
-/* Display Results */
-function displayPlants() {
+function displayPlants(plants) {
   const table = document.getElementById("plantsTable");
   const tbody = table.querySelector("tbody");
   tbody.innerHTML = "";
 
-  filteredPlants.forEach(p => {
+  plants.slice(0, 15).forEach(p => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${p["Plant Name"] || ""}</td>
-      <td>${p["Category"] || ""}</td>
-      <td>${p["USDA Zone"] || ""}</td>
-      <td>${p["Pollinator Friendly"] || ""}</td>
+      <td>${p["Plant Name"]}</td>
+      <td>${p["Category"]}</td>
+      <td>${p["USDA Zone"]}</td>
     `;
     tbody.appendChild(row);
   });
 
   table.style.display = "table";
-  document.getElementById("downloadBtn").style.display = "inline-block";
-}
-
-/* Download CSV */
-function downloadCSV() {
-  const csv = Papa.unparse(filteredPlants);
-  const blob = new Blob([csv], { type: "text/csv" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "rootplans_garden_plan.csv";
-  link.click();
 }
 
 </script>
