@@ -60,12 +60,12 @@
 <script>
 // Load full ZIP -> Zone JSON
 let zipToZone = {};
-fetch("zip_to_zone.json") // you will need this file in repo
+fetch("zip_to_zone.json") // Must exist in repo root
   .then(response => response.json())
   .then(data => zipToZone = data)
   .catch(err => alert("Error loading ZIP to Zone data: " + err));
 
-const csvURL = "rootplans_master_database.csv"; // hosted in repo
+const csvURL = "rootplans_master_database.csv"; // hosted in repo root
 let userZone = null;
 let plantsData = [];
 let gardenPlan = [];
