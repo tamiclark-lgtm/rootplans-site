@@ -1,31 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>RootPlans Garden Builder</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    label { display: block; margin: 10px 0 5px; }
-    input, select, button { padding: 5px; font-size: 16px; margin-right: 5px; margin-bottom: 10px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background-color: #f2f2f2; }
-  </style>
+<meta charset="UTF-8">
+<title>RootPlans Garden Builder</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  label { display: block; margin: 10px 0 5px; }
+  input, select, button { padding: 5px; font-size: 16px; margin-right: 5px; margin-bottom: 10px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ddd; padding: 8px; }
+  th { background-color: #f2f2f2; }
+</style>
 </head>
 <body>
 
 <h1>RootPlans Garden Builder</h1>
 
-<!-- Step 1: Detect Zone -->
+<!-- ZIP input -->
 <label for="zip">Enter your ZIP code (US only):</label>
 <input type="text" id="zip" placeholder="e.g., 90210" />
 <button id="detectZone">Detect Zone</button>
 <p id="zoneMessage"></p>
 
-<!-- Step 2: Buttons will appear here -->
 <div id="zoneButtons"></div>
 
-<!-- Step 3: User preferences -->
+<!-- Garden preferences -->
 <div id="preferences" style="display:none;">
   <label for="size">Garden Size:</label>
   <select id="size">
@@ -42,7 +41,7 @@
   <button id="generatePlan">Generate Garden Plan</button>
 </div>
 
-<!-- Step 4: Recommended plants table -->
+<!-- Plants table -->
 <table id="plantsTable" style="display:none">
   <thead>
     <tr>
@@ -59,113 +58,112 @@
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-  // Basic demo ZIP to USDA Zone mapping
-  const zipToZone = {
-    "90210": 9,
-    "10001": 7,
-    "30301": 8
-    // expand with more ZIPs
-  };
+// Load full ZIP -> Zone JSON
+let zipToZone = {};
+fetch("zip_to_zone.json") // you will need this file in repo
+  .then(response => response.json())
+  .then(data => zipToZone = data)
+  .catch(err => alert("Error loading ZIP to Zone data: " + err));
 
-  const csvURL = "rootplans_master_database.csv"; // hosted on GitHub Pages
-  let userZone = null;
-  let plantsData = [];
-  let gardenPlan = [];
+const csvURL = "rootplans_master_database.csv"; // hosted in repo
+let userZone = null;
+let plantsData = [];
+let gardenPlan = [];
 
-  document.getElementById('detectZone').addEventListener('click', function() {
-    const zip = document.getElementById('zip').value.trim();
-    const zone = zipToZone[zip];
-    const zoneMessage = document.getElementById('zoneMessage');
-    const zoneButtonsDiv = document.getElementById('zoneButtons');
-    zoneButtonsDiv.innerHTML = "";
+document.getElementById('detectZone').addEventListener('click', function() {
+  const zip = document.getElementById('zip').value.trim();
+  const zone = zipToZone[zip];
+  const zoneMessage = document.getElementById('zoneMessage');
+  const zoneButtonsDiv = document.getElementById('zoneButtons');
+  zoneButtonsDiv.innerHTML = "";
 
-    if(zone) {
-      userZone = zone;
-      zoneMessage.innerText = `Detected zone: Zone ${zone}. Is this correct?`;
+  if(zone) {
+    userZone = zone;
+    zoneMessage.innerText = `Detected zone: Zone ${zone}. Is this correct?`;
 
-      const yesBtn = document.createElement('button');
-      yesBtn.innerText = "Yes";
-      yesBtn.onclick = () => {
-        document.getElementById('preferences').style.display = "block";
-        loadCSV();
-      };
+    const yesBtn = document.createElement('button');
+    yesBtn.innerText = "Yes";
+    yesBtn.onclick = () => {
+      document.getElementById('preferences').style.display = "block";
+      loadCSV();
+    };
 
-      const changeBtn = document.createElement('button');
-      changeBtn.innerText = "Change ZIP";
-      changeBtn.onclick = () => {
-        document.getElementById('zip').value = "";
-        zoneMessage.innerText = "";
-        document.getElementById('preferences').style.display = "none";
-        document.getElementById('plantsTable').style.display = "none";
-        document.getElementById('downloadCSV').style.display = "none";
-      };
+    const changeBtn = document.createElement('button');
+    changeBtn.innerText = "Change ZIP";
+    changeBtn.onclick = () => {
+      document.getElementById('zip').value = "";
+      zoneMessage.innerText = "";
+      document.getElementById('preferences').style.display = "none";
+      document.getElementById('plantsTable').style.display = "none";
+      document.getElementById('downloadCSV').style.display = "none";
+    };
 
-      zoneButtonsDiv.appendChild(yesBtn);
-      zoneButtonsDiv.appendChild(changeBtn);
-    } else {
-      zoneMessage.innerText = "ZIP code not found. Please enter a valid US ZIP.";
+    zoneButtonsDiv.appendChild(yesBtn);
+    zoneButtonsDiv.appendChild(changeBtn);
+
+  } else {
+    zoneMessage.innerText = "ZIP code not found. Please enter a valid US ZIP.";
+  }
+});
+
+function loadCSV() {
+  Papa.parse(csvURL, {
+    download: true,
+    header: true,
+    complete: function(results) {
+      plantsData = results.data.filter(p => p["Plant Name"]);
+    },
+    error: function(err) {
+      alert("Error loading plant data: " + err);
     }
   });
+}
 
-  function loadCSV() {
-    Papa.parse(csvURL, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        plantsData = results.data.filter(p => p["Plant Name"]); // remove empty rows
-      },
-      error: function(err) {
-        alert("Error loading plant data: " + err);
-      }
-    });
-  }
+document.getElementById('generatePlan').addEventListener('click', function() {
+  const pollinatorOnly = document.getElementById('pollinator').checked;
 
-  document.getElementById('generatePlan').addEventListener('click', function() {
-    const pollinatorOnly = document.getElementById('pollinator').checked;
-
-    gardenPlan = plantsData.filter(p => {
-      if(!p["USDA Zone"]) return false;
-      const zones = p["USDA Zone"].split(",").map(z => z.trim());
-      if(!zones.includes(String(userZone))) return false;
-      if(pollinatorOnly && p["Pollinator Friendly"] !== "Yes") return false;
-      return true;
-    });
-
-    displayPlants(gardenPlan);
+  gardenPlan = plantsData.filter(p => {
+    if(!p["USDA Zone"]) return false;
+    const zones = p["USDA Zone"].split(",").map(z => z.trim());
+    if(!zones.includes(String(userZone))) return false;
+    if(pollinatorOnly && p["Pollinator Friendly"] !== "Yes") return false;
+    return true;
   });
 
-  function displayPlants(plants) {
-    const table = document.getElementById('plantsTable');
-    const tbody = table.querySelector('tbody');
-    tbody.innerHTML = "";
+  displayPlants(gardenPlan);
+});
 
-    plants.forEach(p => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${p["Plant Name"] || ""}</td>
-        <td>${p["Category"] || ""}</td>
-        <td>${p["USDA Zone"] || ""}</td>
-        <td>${p["Pollinator Friendly"] || ""}</td>
-      `;
-      tbody.appendChild(row);
-    });
+function displayPlants(plants) {
+  const table = document.getElementById('plantsTable');
+  const tbody = table.querySelector('tbody');
+  tbody.innerHTML = "";
 
-    table.style.display = "table";
-    document.getElementById('downloadCSV').style.display = "inline-block";
-  }
-
-  // Download garden plan as CSV
-  document.getElementById('downloadCSV').addEventListener('click', function() {
-    if(gardenPlan.length === 0) return;
-    const csv = Papa.unparse(gardenPlan);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "garden_plan.csv";
-    link.click();
+  plants.forEach(p => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${p["Plant Name"] || ""}</td>
+      <td>${p["Category"] || ""}</td>
+      <td>${p["USDA Zone"] || ""}</td>
+      <td>${p["Pollinator Friendly"] || ""}</td>
+    `;
+    tbody.appendChild(row);
   });
+
+  table.style.display = "table";
+  document.getElementById('downloadCSV').style.display = "inline-block";
+}
+
+// Download garden plan CSV
+document.getElementById('downloadCSV').addEventListener('click', function() {
+  if(gardenPlan.length === 0) return;
+  const csv = Papa.unparse(gardenPlan);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "garden_plan.csv";
+  link.click();
+});
 </script>
-
 </body>
 </html>
