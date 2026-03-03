@@ -4,308 +4,812 @@
 <meta charset="UTF-8">
 <title>RootPlans | Intelligent Garden Design</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  margin: 0;
-  background: #f6f8f5;
-  color: #2c3e2f;
+:root {
+  --moss:     #2e4d2e;
+  --fern:     #4a7c59;
+  --sage:     #8aab8a;
+  --cream:    #f5f0e8;
+  --parchment:#ede7d5;
+  --bark:     #3d2b1f;
+  --gold:     #c9a84c;
+  --error:    #b94040;
+  --success:  #3a7d44;
 }
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--bark);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
 header {
-  background: linear-gradient(135deg, #2f5d34, #4e8b54);
-  color: white;
-  padding: 60px 20px;
+  background: var(--moss);
+  padding: 64px 24px 48px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 20% 50%, rgba(74,124,89,0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 30%, rgba(138,171,138,0.2) 0%, transparent 60%);
 }
 
 header h1 {
-  font-size: 42px;
-  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 58px);
+  color: var(--cream);
+  letter-spacing: -0.5px;
+  position: relative;
 }
 
 header p {
-  font-size: 18px;
-  opacity: 0.9;
+  font-size: 15px;
+  color: var(--sage);
+  margin-top: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 300;
+  position: relative;
 }
 
-.container {
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 40px;
+/* ── LAYOUT ── */
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.card {
   background: white;
-  border-radius: 14px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+  border-radius: 16px;
+  padding: 36px;
+  margin-bottom: 28px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 4px 24px rgba(46,77,46,0.07);
+  animation: fadeUp 0.4s ease both;
 }
 
-.section {
-  margin-bottom: 40px;
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
 }
 
-input, select, button {
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
+.step-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
-input, select {
-  width: 100%;
-  border: 1px solid #ccc;
+.card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--moss);
+  margin-bottom: 20px;
 }
 
-button {
-  background: #2f5d34;
-  color: white;
+/* ── INPUTS ── */
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+
+input[type="text"], select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 12px 16px;
+  border: 1.5px solid #d5cfc4;
+  border-radius: 10px;
+  background: var(--cream);
+  color: var(--bark);
+  flex: 1;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+input[type="text"]:focus, select:focus {
+  border-color: var(--fern);
+}
+
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 22px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  margin-top: 10px;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
-button:hover {
-  background: #254a29;
+.btn-primary {
+  background: var(--moss);
+  color: var(--cream);
+  letter-spacing: 0.03em;
 }
 
+.btn-primary:hover { background: var(--bark); }
+
+.btn-primary:disabled {
+  background: var(--sage);
+  cursor: not-allowed;
+}
+
+.btn-generate {
+  background: var(--gold);
+  color: var(--bark);
+  font-size: 15px;
+  padding: 14px 32px;
+  width: 100%;
+  margin-top: 20px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.btn-generate:hover { background: #b8942e; }
+
+/* ── STATUS MESSAGES ── */
+.status {
+  margin-top: 12px;
+  font-size: 14px;
+  min-height: 20px;
+}
+
+.status.success { color: var(--success); font-weight: 500; }
+.status.error   { color: var(--error);   font-weight: 500; }
+.status.loading { color: var(--fern); }
+
+.db-status {
+  font-size: 12px;
+  color: var(--sage);
+  margin-top: 6px;
+}
+
+/* ── THEMES ── */
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
 }
 
 .theme-card {
-  border: 2px solid #e4e8e2;
-  padding: 20px;
+  border: 2px solid #e0d9cc;
   border-radius: 12px;
+  padding: 20px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.2s;
+  background: var(--cream);
 }
 
-.theme-card:hover {
-  border-color: #2f5d34;
-}
+.theme-card:hover { border-color: var(--fern); }
 
 .theme-card.selected {
-  border-color: #2f5d34;
-  background: #f0f6f2;
+  border-color: var(--moss);
+  background: #eef4ee;
 }
 
-.checkbox-row {
+.theme-card .icon { font-size: 28px; margin-bottom: 8px; }
+.theme-card h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--moss); margin-bottom: 4px; }
+.theme-card p  { font-size: 13px; color: #6b7060; line-height: 1.5; }
+
+/* ── CHECKBOXES ── */
+.check-list { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+
+.check-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 10px 0;
+  font-size: 14px;
 }
 
-.checkbox-row input {
-  width: auto;
+.check-row input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: var(--moss);
+  cursor: pointer;
 }
 
-.success { color: green; font-weight: 600; }
-.error { color: red; font-weight: 600; }
+/* ── RESULTS TABLE ── */
+.results-section {
+  animation: fadeUp 0.4s ease both;
+}
+
+.results-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.results-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  color: var(--moss);
+}
+
+.result-count {
+  font-size: 13px;
+  color: var(--sage);
+}
+
+.table-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e0d9cc;
+}
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 30px;
 }
 
-th, td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-}
-
-th {
-  background: #f2f5f1;
+thead th {
+  background: var(--moss);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 16px;
   text-align: left;
 }
+
+tbody tr {
+  transition: background 0.15s;
+}
+
+tbody tr:nth-child(even) { background: var(--cream); }
+tbody tr:hover { background: #eef4ee; }
+
+tbody td {
+  padding: 13px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #ede7d5;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+.plant-name { font-weight: 500; color: var(--bark); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #eef4ee;
+  color: var(--moss);
+  border: 1px solid #c5dbc5;
+}
+
+.native-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: #fdf6e3;
+  color: #8a6820;
+  border: 1px solid #e0c97a;
+  margin-left: 4px;
+}
+
+.power-text { font-size: 13px; color: #5a6b5a; font-style: italic; }
+.power-missing { font-size: 12px; color: #b0aa9a; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--sage);
+}
+
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state p { font-size: 15px; }
+
+.truncated-note {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--sage);
+  text-align: right;
+}
+
+/* ── LOADING SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid var(--sage);
+  border-top-color: var(--fern);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── HIDDEN ── */
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🌱 RootPlans</h1>
-  <p>Intelligent Garden Plans Based on Your Climate & Goals</p>
+  <p>Intelligent Garden Plans Based on Your Climate &amp; Goals</p>
 </header>
 
-<div class="container">
+<div class="page">
 
-<div class="section">
-  <h2>1️⃣ Enter Your ZIP Code</h2>
-  <input type="text" id="zip" placeholder="Enter 5-digit US ZIP">
-  <button onclick="detectZone()">Detect My Zone</button>
-  <p id="zoneMessage"></p>
-</div>
-
-<div id="preferences" style="display:none;">
-
-<div class="section">
-  <h2>2️⃣ Choose Your Garden Philosophy</h2>
-
-  <div class="theme-grid">
-    <div class="theme-card" onclick="selectTheme('functional', this)">
-      <h3>🌿 Functional Food</h3>
-      <p>Plants selected to support health and specific conditions.</p>
+  <!-- STEP 1: ZIP -->
+  <div class="card">
+    <div class="step-label">Step 1</div>
+    <h2>Where are you gardening?</h2>
+    <div class="input-row">
+      <input type="text" id="zip" placeholder="Enter 5-digit US ZIP" maxlength="5" inputmode="numeric">
+      <button class="btn btn-primary" id="detectBtn" onclick="detectZone()">Detect My Zone</button>
     </div>
-
-    <div class="theme-card" onclick="selectTheme('holistic', this)">
-      <h3>🌎 Holistic / Regenerative</h3>
-      <p>Soil-first, ecosystem-driven, biodiversity-focused planning.</p>
-    </div>
-
-    <div class="theme-card" onclick="selectTheme('traditional', this)">
-      <h3>🏡 Traditional Gardener</h3>
-      <p>Classic vegetables, herbs, and flowers for home gardeners.</p>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <h2>3️⃣ Garden Size</h2>
-  <select id="size">
-    <option value="small">Small (1–50 sq ft)</option>
-    <option value="medium">Medium (50–200 sq ft)</option>
-    <option value="large">Large (200+ sq ft)</option>
-  </select>
-
-  <div class="checkbox-row">
-    <input type="checkbox" id="pollinator">
-    <label for="pollinator">Prioritize Pollinator-Friendly Plants</label>
+    <div class="status" id="zoneMessage"></div>
+    <div class="db-status" id="csvStatus"></div>
   </div>
 
-  <button onclick="generatePlan()">Generate My Garden Plan</button>
-</div>
+  <!-- STEP 2 + 3 (hidden until zone detected) -->
+  <div id="preferences" class="hidden">
 
-</div>
+    <div class="card" style="animation-delay:0.05s">
+      <div class="step-label">Step 2</div>
+      <h2>Choose Your Garden Philosophy</h2>
+      <div class="theme-grid">
+        <div class="theme-card" onclick="selectTheme('functional', this)">
+          <div class="icon">🌿</div>
+          <h3>Functional Food</h3>
+          <p>Plants selected to support health and specific conditions.</p>
+        </div>
+        <div class="theme-card" onclick="selectTheme('holistic', this)">
+          <div class="icon">🌎</div>
+          <h3>Holistic / Regenerative</h3>
+          <p>Soil-first, ecosystem-driven, biodiversity-focused planning.</p>
+        </div>
+        <div class="theme-card" onclick="selectTheme('traditional', this)">
+          <div class="icon">🏡</div>
+          <h3>Traditional Gardener</h3>
+          <p>Classic vegetables, herbs, and flowers for home gardeners.</p>
+        </div>
+      </div>
+    </div>
 
-<table id="plantsTable" style="display:none;">
-  <thead>
-    <tr>
-      <th>Plant</th>
-      <th>Category</th>
-      <th>Zone</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+    <div class="card" style="animation-delay:0.1s">
+      <div class="step-label">Step 3</div>
+      <h2>Preferences &amp; Filters</h2>
 
-</div>
+      <label for="size" style="font-size:14px;font-weight:500;display:block;margin-bottom:6px;">Garden Size</label>
+      <select id="size">
+        <option value="small">Small (1–50 sq ft)</option>
+        <option value="medium">Medium (50–200 sq ft)</option>
+        <option value="large">Large (200+ sq ft)</option>
+      </select>
+
+      <div class="check-list" style="margin-top:20px;">
+        <label class="check-row">
+          <input type="checkbox" id="pollinator">
+          <span>Prioritize Pollinator-Friendly Plants</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="nativeOnly">
+          <span>Only show native plants for my zone</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="healingToggle">
+          <span>Show holistic healing notes (when available)</span>
+        </label>
+      </div>
+
+      <button class="btn btn-generate" id="generateBtn" onclick="generatePlan()">
+        Generate My Garden Plan
+      </button>
+    </div>
+
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsSection" class="results-section hidden">
+    <div class="results-header">
+      <h2>Your Garden Plan</h2>
+      <span class="result-count" id="resultCount"></span>
+    </div>
+    <div class="table-wrap">
+      <table id="plantsTable">
+        <thead>
+          <tr id="plantsHeaderRow"></tr>
+        </thead>
+        <tbody id="plantsBody"></tbody>
+      </table>
+    </div>
+    <div class="truncated-note" id="truncatedNote"></div>
+  </div>
+
+</div><!-- /page -->
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <script>
-
-let userZone = null;
-let plantsData = [];
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let userZone    = null;
+let plantsData  = [];
 let selectedTheme = null;
+let csvLoading  = false;
+let csvLoaded   = false;
 
-/* ZIP → Zone */
+/* ═══════════════════════════════════════════
+   COLUMN MAPPING
+═══════════════════════════════════════════ */
+const CSV_COLUMNS = {
+  plantName:    ["Plant Name", "Plant", "Name"],
+  category:     ["Category", "Type"],
+  usdaZone:     ["USDA Zone", "Zone", "Zones"],
+  theme:        ["Theme", "Philosophy"],
+  native:       ["Native", "Is Native", "Native Plant"],
+  holisticPower:["Holistic Power", "Power", "Holistic", "Healing Power"],
+  pollinator:   ["Pollinator", "Pollinator Friendly", "Bee Friendly"]
+};
+
+function getCol(row, keys) {
+  for (const k of keys) {
+    if (row[k] !== undefined && String(row[k]).trim() !== "") return String(row[k]).trim();
+  }
+  return "";
+}
+
+function isYes(val) {
+  const v = String(val || "").trim().toLowerCase();
+  return v === "yes" || v === "y" || v === "true" || v === "1";
+}
+
+/* ═══════════════════════════════════════════
+   ZONE HELPERS — Fixed to cover zones 1–13
+═══════════════════════════════════════════ */
+function tempCtoZone(tempC) {
+  const f = (tempC * 9/5) + 32;
+  if (f < -60) return "1";
+  if (f < -50) return "2";
+  if (f < -40) return "3";
+  if (f < -30) return "4";
+  if (f < -20) return "5";
+  if (f < -10) return "6";
+  if (f <   0) return "7";
+  if (f <  10) return "8";
+  if (f <  20) return "9";
+  if (f <  30) return "10";
+  if (f <  40) return "11";
+  if (f <  50) return "12";
+  return "13";
+}
+
+/**
+ * Check whether a plant's zone string covers userZone.
+ * Handles:
+ *   "7"            → exact
+ *   "6, 7, 8"      → list
+ *   "6-9"          → range
+ *   "6a, 7b"       → subzone letters stripped
+ */
+function zoneMatches(zoneText, userZone) {
+  if (!zoneText) return false;
+
+  const userNum = parseInt(userZone, 10);
+
+  // Normalize: strip subzone letters, split on commas/spaces
+  const parts = zoneText
+    .replace(/[a-zA-Z]/g, "")   // strip a/b subzones
+    .split(/[\s,]+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  for (const part of parts) {
+    // Range: "6-9"
+    if (part.includes("-")) {
+      const [lo, hi] = part.split("-").map(Number);
+      if (!isNaN(lo) && !isNaN(hi) && userNum >= lo && userNum <= hi) return true;
+    } else {
+      // Single
+      if (parseInt(part, 10) === userNum) return true;
+    }
+  }
+  return false;
+}
+
+/* ═══════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════ */
+function setStatus(id, html, cls = "") {
+  const el = document.getElementById(id);
+  el.innerHTML = html;
+  el.className = "status " + cls;
+}
+
+function setBtn(id, disabled, html) {
+  const btn = document.getElementById(id);
+  btn.disabled = disabled;
+  btn.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════
+   ZIP → ZONE
+═══════════════════════════════════════════ */
+let detectInProgress = false;
+
 async function detectZone() {
+  if (detectInProgress) return;
   const zip = document.getElementById("zip").value.trim();
-  const message = document.getElementById("zoneMessage");
 
   if (!/^\d{5}$/.test(zip)) {
-    message.innerHTML = "<span class='error'>Enter a valid ZIP.</span>";
+    setStatus("zoneMessage", "Please enter a valid 5-digit ZIP.", "error");
     return;
   }
 
+  detectInProgress = true;
+  setBtn("detectBtn", true, `<span class="spinner"></span>Detecting…`);
+  setStatus("zoneMessage", "Looking up your location…", "loading");
+  document.getElementById("csvStatus").textContent = "";
+
   try {
+    // 1. ZIP → lat/lon
     const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
+    if (!zipRes.ok) throw new Error("ZIP not found. Please double-check and try again.");
     const zipData = await zipRes.json();
     const lat = zipData.places[0].latitude;
     const lon = zipData.places[0].longitude;
+    const city = `${zipData.places[0]["place name"]}, ${zipData.places[0]["state abbreviation"]}`;
 
+    setStatus("zoneMessage", "Fetching historical temperature data…", "loading");
+
+    // 2. lat/lon → historical minimum temp
     const weatherRes = await fetch(
-      `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=2024-01-01&end_date=2024-12-31&daily=temperature_2m_min&timezone=auto`
+      `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}` +
+      `&start_date=2023-01-01&end_date=2023-12-31&daily=temperature_2m_min&timezone=auto`
+    );
+    if (!weatherRes.ok) throw new Error("Weather data unavailable. Please try again.");
+    const weatherData = await weatherRes.json();
+
+    const mins = weatherData.daily.temperature_2m_min.filter(v => v !== null);
+    if (!mins.length) throw new Error("No temperature data returned for this location.");
+
+    const absoluteMin = Math.min(...mins);
+    userZone = tempCtoZone(absoluteMin);
+
+    setStatus("zoneMessage",
+      `✓ Detected <strong>USDA Zone ${userZone}</strong> — ${city}`,
+      "success"
     );
 
-    const weatherData = await weatherRes.json();
-    const absoluteMin = Math.min(...weatherData.daily.temperature_2m_min);
-    userZone = convertTempToZone(absoluteMin);
+    document.getElementById("preferences").classList.remove("hidden");
 
-    message.innerHTML = `<span class='success'>USDA Zone ${userZone}</span>`;
-    document.getElementById("preferences").style.display = "block";
+    // 3. Load CSV (only once; prevent double-load)
+    if (!csvLoaded && !csvLoading) {
+      await loadCSV();
+    }
 
-    loadCSV();
-
-  } catch {
-    message.innerHTML = "<span class='error'>Unable to detect zone.</span>";
+  } catch (e) {
+    setStatus("zoneMessage", e.message || "Detection failed. Please try again.", "error");
+  } finally {
+    detectInProgress = false;
+    setBtn("detectBtn", false, "Detect My Zone");
   }
 }
 
-function convertTempToZone(tempC) {
-  const tempF = (tempC * 9/5) + 32;
-  if (tempF <= -10) return "5";
-  if (tempF <= 0) return "6";
-  if (tempF <= 10) return "7";
-  if (tempF <= 20) return "8";
-  if (tempF <= 30) return "9";
-  return "10";
-}
-
-/* Theme Selection */
-function selectTheme(theme, element) {
-  selectedTheme = theme;
-  document.querySelectorAll(".theme-card").forEach(card => card.classList.remove("selected"));
-  element.classList.add("selected");
-}
-
-/* Load CSV from GitHub Pages */
+/* ═══════════════════════════════════════════
+   CSV LOADING — guarded against race conditions
+═══════════════════════════════════════════ */
 function loadCSV() {
-  // Must be in the same repo root or in /data folder
-  Papa.parse("rootplans_master_database.csv", {
-    download: true,
-    header: true,
-    complete: function(results) {
-      plantsData = results.data;
-    },
-    error: function(err) {
-      alert("Error loading CSV: " + err);
-    }
+  if (csvLoaded) return Promise.resolve();
+  if (csvLoading) return new Promise(resolve => {
+    const wait = setInterval(() => {
+      if (csvLoaded) { clearInterval(wait); resolve(); }
+    }, 100);
+  });
+
+  csvLoading = true;
+  document.getElementById("csvStatus").textContent = "Loading plant database…";
+
+  return new Promise((resolve, reject) => {
+    Papa.parse("rootplans_master_database.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete(results) {
+        plantsData = (results.data || []).filter(r => Object.keys(r).length > 1);
+        csvLoaded  = true;
+        csvLoading = false;
+        document.getElementById("csvStatus").textContent =
+          `Plant database ready — ${plantsData.length} plants`;
+        resolve();
+      },
+      error(err) {
+        csvLoading = false;
+        document.getElementById("csvStatus").textContent =
+          "⚠ Could not load plant database (CSV not found).";
+        resolve(); // Don't reject — let the user still see the UI
+      }
+    });
   });
 }
 
-/* Generate Plan */
-function generatePlan() {
+/* ═══════════════════════════════════════════
+   THEME SELECTION
+═══════════════════════════════════════════ */
+function selectTheme(theme, element) {
+  selectedTheme = theme;
+  document.querySelectorAll(".theme-card").forEach(c => c.classList.remove("selected"));
+  element.classList.add("selected");
+}
 
-  if (!selectedTheme) {
-    alert("Please select a garden philosophy.");
-    return;
-  }
+/* ═══════════════════════════════════════════
+   GENERATE PLAN
+═══════════════════════════════════════════ */
+async function generatePlan() {
+  if (!userZone) { alert("Please detect your zone first."); return; }
+  if (!selectedTheme) { alert("Please select a garden philosophy."); return; }
+
+  setBtn("generateBtn", true, `<span class="spinner"></span>Building your plan…`);
+
+  // If CSV still loading, wait
+  if (!csvLoaded) await loadCSV();
+
+  const nativeOnly    = document.getElementById("nativeOnly").checked;
+  const healingToggle = document.getElementById("healingToggle").checked;
+  const pollinatorPref= document.getElementById("pollinator").checked;
+
+  const themeMap = { functional: "Functional", holistic: "Holistic", traditional: "Traditional" };
+  const wantedTheme = themeMap[selectedTheme];
 
   let filtered = plantsData.filter(p => {
-    if (!p["USDA Zone"]) return false;
-    const zones = p["USDA Zone"].split(",");
-    if (!zones.includes(userZone)) return false;
+    // Zone check (fixed: handles ranges and lists)
+    const zoneText = getCol(p, CSV_COLUMNS.usdaZone);
+    if (!zoneMatches(zoneText, userZone)) return false;
 
-    if (selectedTheme === "functional" && p["Theme"] !== "Functional") return false;
-    if (selectedTheme === "holistic" && p["Theme"] !== "Holistic") return false;
-    if (selectedTheme === "traditional" && p["Theme"] !== "Traditional") return false;
+    // Theme check
+    const themeText = getCol(p, CSV_COLUMNS.theme);
+    if (themeText && themeText !== wantedTheme) return false;
+
+    // Native-only filter
+    if (nativeOnly) {
+      const nativeVal = getCol(p, CSV_COLUMNS.native);
+      if (!isYes(nativeVal)) return false;
+    }
+
+    // Pollinator filter
+    if (pollinatorPref) {
+      const pollVal = getCol(p, CSV_COLUMNS.pollinator);
+      // Only filter if the column exists; otherwise let through
+      if (pollVal && !isYes(pollVal)) return false;
+    }
 
     return true;
   });
 
-  displayPlants(filtered);
+  setBtn("generateBtn", false, "Generate My Garden Plan");
+  displayPlants(filtered, healingToggle);
 }
 
-function displayPlants(plants) {
-  const table = document.getElementById("plantsTable");
-  const tbody = table.querySelector("tbody");
-  tbody.innerHTML = "";
+/* ═══════════════════════════════════════════
+   DISPLAY
+═══════════════════════════════════════════ */
+const MAX_DISPLAY = 20;
 
-  plants.slice(0, 15).forEach(p => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${p["Plant Name"]}</td>
-      <td>${p["Category"]}</td>
-      <td>${p["USDA Zone"]}</td>
-    `;
-    tbody.appendChild(row);
+function displayPlants(plants, showPower) {
+  const section   = document.getElementById("resultsSection");
+  const headerRow = document.getElementById("plantsHeaderRow");
+  const tbody     = document.getElementById("plantsBody");
+  const countEl   = document.getElementById("resultCount");
+  const noteEl    = document.getElementById("truncatedNote");
+
+  // Build header
+  headerRow.innerHTML = `
+    <th>Plant</th>
+    <th>Category</th>
+    <th>Zone(s)</th>
+    ${showPower ? "<th>Holistic Notes</th>" : ""}
+  `;
+
+  tbody.innerHTML = "";
+  noteEl.textContent = "";
+
+  if (!plants.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="${showPower ? 4 : 3}">
+        <div class="empty-state">
+          <div class="icon">🔍</div>
+          <p>No plants matched your filters for Zone ${userZone}.<br>
+             Try relaxing the native-only or pollinator filters.</p>
+        </div>
+      </td></tr>`;
+    countEl.textContent = "0 plants found";
+    section.classList.remove("hidden");
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  const display = plants.slice(0, MAX_DISPLAY);
+
+  display.forEach(p => {
+    const plantName = getCol(p, CSV_COLUMNS.plantName) || "(Unnamed Plant)";
+    const category  = getCol(p, CSV_COLUMNS.category);
+    const zoneText  = getCol(p, CSV_COLUMNS.usdaZone);
+    const power     = getCol(p, CSV_COLUMNS.holisticPower);
+    const isNative  = isYes(getCol(p, CSV_COLUMNS.native));
+
+    const tr = document.createElement("tr");
+
+    const nameTd = document.createElement("td");
+    nameTd.innerHTML = `<span class="plant-name"></span>`;
+    nameTd.querySelector(".plant-name").textContent = plantName;
+    if (isNative) {
+      const badge = document.createElement("span");
+      badge.className = "native-badge";
+      badge.textContent = "native";
+      nameTd.appendChild(badge);
+    }
+
+    const catTd = document.createElement("td");
+    if (category) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = category;
+      catTd.appendChild(badge);
+    }
+
+    const zoneTd = document.createElement("td");
+    zoneTd.textContent = zoneText;
+
+    tr.appendChild(nameTd);
+    tr.appendChild(catTd);
+    tr.appendChild(zoneTd);
+
+    if (showPower) {
+      const powerTd = document.createElement("td");
+      if (power) {
+        const span = document.createElement("span");
+        span.className = "power-text";
+        span.textContent = power;
+        powerTd.appendChild(span);
+      } else {
+        const span = document.createElement("span");
+        span.className = "power-missing";
+        span.textContent = "—";
+        powerTd.appendChild(span);
+      }
+      tr.appendChild(powerTd);
+    }
+
+    tbody.appendChild(tr);
   });
 
-  table.style.display = "table";
+  countEl.textContent = `${plants.length} plant${plants.length !== 1 ? "s" : ""} found`;
+
+  if (plants.length > MAX_DISPLAY) {
+    noteEl.textContent = `Showing ${MAX_DISPLAY} of ${plants.length} matching plants.`;
+  }
+
+  section.classList.remove("hidden");
+  setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
 }
-
 </script>
-
 </body>
 </html>
