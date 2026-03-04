@@ -1,815 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>RootPlans | Intelligent Garden Design</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RootPlans | Intelligent Garden Design</title>
+  <meta name="description" content="RootPlans helps you build a smarter garden plan based on your location, goals, and style." />
 
-<style>
-:root {
-  --moss:     #2e4d2e;
-  --fern:     #4a7c59;
-  --sage:     #8aab8a;
-  --cream:    #f5f0e8;
-  --parchment:#ede7d5;
-  --bark:     #3d2b1f;
-  --gold:     #c9a84c;
-  --error:    #b94040;
-  --success:  #3a7d44;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--cream);
-  color: var(--bark);
-  min-height: 100vh;
-}
-
-/* ── HEADER ── */
-header {
-  background: var(--moss);
-  padding: 64px 24px 48px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 80% at 20% 50%, rgba(74,124,89,0.35) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 60% at 80% 30%, rgba(138,171,138,0.2) 0%, transparent 60%);
-}
-
-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(36px, 6vw, 58px);
-  color: var(--cream);
-  letter-spacing: -0.5px;
-  position: relative;
-}
-
-header p {
-  font-size: 15px;
-  color: var(--sage);
-  margin-top: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 300;
-  position: relative;
-}
-
-/* ── LAYOUT ── */
-.page {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 48px 24px 80px;
-}
-
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 36px;
-  margin-bottom: 28px;
-  border: 1px solid rgba(0,0,0,0.06);
-  box-shadow: 0 4px 24px rgba(46,77,46,0.07);
-  animation: fadeUp 0.4s ease both;
-}
-
-@keyframes fadeUp {
-  from { opacity:0; transform: translateY(16px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-
-.step-label {
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--sage);
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.card h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  color: var(--moss);
-  margin-bottom: 20px;
-}
-
-/* ── INPUTS ── */
-.input-row {
-  display: flex;
-  gap: 10px;
-}
-
-input[type="text"], select {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  padding: 12px 16px;
-  border: 1.5px solid #d5cfc4;
-  border-radius: 10px;
-  background: var(--cream);
-  color: var(--bark);
-  flex: 1;
-  transition: border-color 0.2s;
-  outline: none;
-}
-
-input[type="text"]:focus, select:focus {
-  border-color: var(--fern);
-}
-
-.btn {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 12px 22px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.btn-primary {
-  background: var(--moss);
-  color: var(--cream);
-  letter-spacing: 0.03em;
-}
-
-.btn-primary:hover { background: var(--bark); }
-
-.btn-primary:disabled {
-  background: var(--sage);
-  cursor: not-allowed;
-}
-
-.btn-generate {
-  background: var(--gold);
-  color: var(--bark);
-  font-size: 15px;
-  padding: 14px 32px;
-  width: 100%;
-  margin-top: 20px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-}
-
-.btn-generate:hover { background: #b8942e; }
-
-/* ── STATUS MESSAGES ── */
-.status {
-  margin-top: 12px;
-  font-size: 14px;
-  min-height: 20px;
-}
-
-.status.success { color: var(--success); font-weight: 500; }
-.status.error   { color: var(--error);   font-weight: 500; }
-.status.loading { color: var(--fern); }
-
-.db-status {
-  font-size: 12px;
-  color: var(--sage);
-  margin-top: 6px;
-}
-
-/* ── THEMES ── */
-.theme-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
-}
-
-.theme-card {
-  border: 2px solid #e0d9cc;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: var(--cream);
-}
-
-.theme-card:hover { border-color: var(--fern); }
-
-.theme-card.selected {
-  border-color: var(--moss);
-  background: #eef4ee;
-}
-
-.theme-card .icon { font-size: 28px; margin-bottom: 8px; }
-.theme-card h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--moss); margin-bottom: 4px; }
-.theme-card p  { font-size: 13px; color: #6b7060; line-height: 1.5; }
-
-/* ── CHECKBOXES ── */
-.check-list { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
-
-.check-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-}
-
-.check-row input[type="checkbox"] {
-  width: 18px; height: 18px;
-  accent-color: var(--moss);
-  cursor: pointer;
-}
-
-/* ── RESULTS TABLE ── */
-.results-section {
-  animation: fadeUp 0.4s ease both;
-}
-
-.results-header {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.results-header h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  color: var(--moss);
-}
-
-.result-count {
-  font-size: 13px;
-  color: var(--sage);
-}
-
-.table-wrap {
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #e0d9cc;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-thead th {
-  background: var(--moss);
-  color: var(--cream);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 14px 16px;
-  text-align: left;
-}
-
-tbody tr {
-  transition: background 0.15s;
-}
-
-tbody tr:nth-child(even) { background: var(--cream); }
-tbody tr:hover { background: #eef4ee; }
-
-tbody td {
-  padding: 13px 16px;
-  font-size: 14px;
-  border-bottom: 1px solid #ede7d5;
-  vertical-align: top;
-  line-height: 1.5;
-}
-
-tbody tr:last-child td { border-bottom: none; }
-
-.plant-name { font-weight: 500; color: var(--bark); }
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 500;
-  background: #eef4ee;
-  color: var(--moss);
-  border: 1px solid #c5dbc5;
-}
-
-.native-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  background: #fdf6e3;
-  color: #8a6820;
-  border: 1px solid #e0c97a;
-  margin-left: 4px;
-}
-
-.power-text { font-size: 13px; color: #5a6b5a; font-style: italic; }
-.power-missing { font-size: 12px; color: #b0aa9a; }
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--sage);
-}
-
-.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
-.empty-state p { font-size: 15px; }
-
-.truncated-note {
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--sage);
-  text-align: right;
-}
-
-/* ── LOADING SPINNER ── */
-.spinner {
-  display: inline-block;
-  width: 14px; height: 14px;
-  border: 2px solid var(--sage);
-  border-top-color: var(--fern);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── HIDDEN ── */
-.hidden { display: none !important; }
-</style>
+  <style>
+    :root{
+      --bg:#f6f8f5;
+      --card:#ffffff;
+      --text:#2c3e2f;
+      --muted:#5a6a5f;
+      --green1:#2f5d34;
+      --green2:#4e8b54;
+      --border:#e6eee6;
+      --shadow: 0 10px 28px rgba(0,0,0,.08);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      background:linear-gradient(135deg,var(--green1),var(--green2));
+      color:#fff;
+      padding:54px 18px;
+      text-align:center;
+    }
+    header h1{margin:0;font-size:42px;letter-spacing:.2px}
+    header p{margin:10px 0 0;opacity:.9;font-size:18px}
+    .container{
+      max-width:1100px;
+      margin:28px auto 70px;
+      padding:0 16px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+    }
+    @media(min-width:900px){
+      .grid{grid-template-columns: 1.2fr .8fr;}
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .card h2{margin:0 0 10px;font-size:20px}
+    .muted{color:var(--muted)}
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .input{
+      flex:1;
+      min-width:220px;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      font-size:16px;
+      outline:none;
+    }
+    .input:focus{border-color:#b9d4bf}
+    button{
+      border:0;
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:16px;
+      cursor:pointer;
+    }
+    .btn{
+      background:linear-gradient(135deg,var(--green1),var(--green2));
+      color:#fff;
+      font-weight:700;
+    }
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn2{
+      background:#eef5ef;
+      color:var(--text);
+      border:1px solid var(--border);
+      font-weight:700;
+    }
+    .pillRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background:#f3f8f3;
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .pill[aria-pressed="true"]{
+      background:#e1f0e4;
+      border-color:#b9d4bf;
+    }
+    .chip{
+      border:1px solid var(--border);
+      background:#ffffff;
+      padding:9px 11px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .resultBox{
+      margin-top:14px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fbfdfb;
+    }
+    .big{
+      font-size:22px;
+      font-weight:900;
+      margin:0 0 6px;
+    }
+    .small{
+      margin:0;
+      color:var(--muted);
+      line-height:1.4;
+    }
+    .notice{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi .box{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      background:#ffffff;
+    }
+    .box .label{font-size:12px;color:var(--muted);margin:0 0 6px}
+    .box .value{font-size:16px;font-weight:900;margin:0}
+    pre{
+      border:1px solid var(--border);
+      background:#ffffff;
+      border-radius:14px;
+      padding:12px;
+      overflow:auto;
+      max-height:520px;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    footer{
+      text-align:center;
+      color:var(--muted);
+      padding:26px 10px 40px;
+      font-size:13px;
+    }
+    .hr{
+      border:0;
+      border-top:1px solid var(--border);
+      margin:16px 0;
+    }
+  </style>
 </head>
+
 <body>
+  <header>
+    <h1>RootPlans</h1>
+    <p>Intelligent garden design — tailored to your location and goals.</p>
+  </header>
 
-<header>
-  <h1>🌱 RootPlans</h1>
-  <p>Intelligent Garden Plans Based on Your Climate &amp; Goals</p>
-</header>
+  <div class="container">
+    <div class="grid">
+      <!-- LEFT: Inputs -->
+      <div class="card">
+        <h2>1) Enter your ZIP code</h2>
+        <p class="muted" style="margin-top:0">We’ll detect your USDA hardiness zone and start building your plan.</p>
 
-<div class="page">
-
-  <!-- STEP 1: ZIP -->
-  <div class="card">
-    <div class="step-label">Step 1</div>
-    <h2>Where are you gardening?</h2>
-    <div class="input-row">
-      <input type="text" id="zip" placeholder="Enter 5-digit US ZIP" maxlength="5" inputmode="numeric">
-      <button class="btn btn-primary" id="detectBtn" onclick="detectZone()">Detect My Zone</button>
-    </div>
-    <div class="status" id="zoneMessage"></div>
-    <div class="db-status" id="csvStatus"></div>
-  </div>
-
-  <!-- STEP 2 + 3 (hidden until zone detected) -->
-  <div id="preferences" class="hidden">
-
-    <div class="card" style="animation-delay:0.05s">
-      <div class="step-label">Step 2</div>
-      <h2>Choose Your Garden Philosophy</h2>
-      <div class="theme-grid">
-        <div class="theme-card" onclick="selectTheme('functional', this)">
-          <div class="icon">🌿</div>
-          <h3>Functional Food</h3>
-          <p>Plants selected to support health and specific conditions.</p>
+        <div class="row">
+          <input id="zipInput" class="input" inputmode="numeric" maxlength="5" placeholder="e.g., 17543" />
+          <button id="detectBtn" class="btn" type="button">Detect Zone</button>
+          <button id="resetBtn" class="btn2" type="button">Reset</button>
         </div>
-        <div class="theme-card" onclick="selectTheme('holistic', this)">
-          <div class="icon">🌎</div>
-          <h3>Holistic / Regenerative</h3>
-          <p>Soil-first, ecosystem-driven, biodiversity-focused planning.</p>
+
+        <div class="resultBox" id="zoneBox" style="display:none">
+          <p class="big" id="zoneTitle">Detected USDA Zone</p>
+          <p class="small" id="zoneDetails"></p>
+
+          <div class="kpi">
+            <div class="box">
+              <p class="label">USDA Zone</p>
+              <p class="value" id="zoneValue">—</p>
+            </div>
+            <div class="box">
+              <p class="label">Location</p>
+              <p class="value" id="locValue">—</p>
+            </div>
+          </div>
+
+          <div class="notice" id="zoneNote"></div>
         </div>
-        <div class="theme-card" onclick="selectTheme('traditional', this)">
-          <div class="icon">🏡</div>
-          <h3>Traditional Gardener</h3>
-          <p>Classic vegetables, herbs, and flowers for home gardeners.</p>
+
+        <hr class="hr" />
+
+        <h2>2) Pick a garden “theme”</h2>
+        <p class="muted" style="margin-top:0">Choose one. We’ll tailor plants + guidance to match.</p>
+
+        <div class="pillRow" id="themeRow">
+          <button class="pill" type="button" data-theme="Functional Food" aria-pressed="false">Functional Food</button>
+          <button class="pill" type="button" data-theme="Pollinator Paradise" aria-pressed="false">Pollinator Paradise</button>
+          <button class="pill" type="button" data-theme="Low-Maintenance Beauty" aria-pressed="false">Low-Maintenance Beauty</button>
+        </div>
+
+        <div class="resultBox" id="themeBox" style="display:none">
+          <p class="big" style="margin:0 0 6px">Selected theme</p>
+          <p class="small" id="themeText"></p>
+        </div>
+
+        <!-- Functional Food conditions (type-ahead) -->
+        <div class="resultBox" id="conditionsBox" style="display:none">
+          <p class="big" style="margin:0 0 8px">Functional food focus</p>
+          <p class="small" style="margin:0 0 10px">Type a condition and add it (ex: inflammation, cholesterol). You can add multiple.</p>
+
+          <div class="row">
+            <input id="conditionInput" class="input" placeholder="Start typing a condition…" />
+            <button id="addConditionBtn" class="btn2" type="button">Add</button>
+          </div>
+
+          <div class="pillRow" id="suggestionsRow" style="margin-top:10px"></div>
+
+          <div class="notice" style="margin-top:10px">Selected (click to remove):</div>
+          <div class="pillRow" id="selectedConditionsRow" style="margin-top:8px"></div>
+        </div>
+
+        <hr class="hr" />
+
+        <h2>3) Generate your plan</h2>
+        <p class="muted" style="margin-top:0">This calls your AI backend (your API key stays server-side).</p>
+
+        <div class="row">
+          <button id="generateBtn" class="btn" type="button">Generate with AI</button>
+          <button id="copyBtn" class="btn2" type="button" style="display:none">Copy output</button>
+        </div>
+
+        <div class="notice" id="aiStatus" style="margin-top:10px"></div>
+        <pre id="aiOutput" style="display:none; margin-top:10px"></pre>
+
+        <div class="notice" style="margin-top:12px">
+          <b>Important:</b> GitHub Pages can’t safely run your Anthropic API key in the browser. You must set up a small “proxy” endpoint
+          (Cloudflare Worker / Vercel / Netlify) and paste its URL below in the config.
+        </div>
+      </div>
+
+      <!-- RIGHT: Status / Config -->
+      <div class="card">
+        <h2>Status</h2>
+        <p class="muted" style="margin-top:0" id="statusText">
+          Enter a ZIP and click <b>Detect Zone</b>.
+        </p>
+
+        <div class="resultBox">
+          <p class="big" style="margin:0 0 6px">Quick config</p>
+          <p class="small" style="margin:0 0 10px">
+            Set your AI proxy URL inside this file (search for <b>AI_PROXY_URL</b>).
+          </p>
+          <div class="notice" style="margin-top:10px">
+            Example: <code>https://your-worker.yourname.workers.dev/generate</code>
+          </div>
+        </div>
+
+        <div class="resultBox" style="margin-top:12px">
+          <p class="big" style="margin:0 0 6px">Zone note</p>
+          <p class="small" style="margin:0">
+            USDA hardiness zones are based on average annual extreme minimum winter temperatures (not today’s weather).
+          </p>
+        </div>
+
+        <div class="resultBox" style="margin-top:12px">
+          <p class="big" style="margin:0 0 6px">Troubleshooting</p>
+          <p class="small" style="margin:0">
+            If zone fails, try again. If AI fails, your proxy likely isn’t set or CORS is blocking it.
+          </p>
         </div>
       </div>
     </div>
-
-    <div class="card" style="animation-delay:0.1s">
-      <div class="step-label">Step 3</div>
-      <h2>Preferences &amp; Filters</h2>
-
-      <label for="size" style="font-size:14px;font-weight:500;display:block;margin-bottom:6px;">Garden Size</label>
-      <select id="size">
-        <option value="small">Small (1–50 sq ft)</option>
-        <option value="medium">Medium (50–200 sq ft)</option>
-        <option value="large">Large (200+ sq ft)</option>
-      </select>
-
-      <div class="check-list" style="margin-top:20px;">
-        <label class="check-row">
-          <input type="checkbox" id="pollinator">
-          <span>Prioritize Pollinator-Friendly Plants</span>
-        </label>
-        <label class="check-row">
-          <input type="checkbox" id="nativeOnly">
-          <span>Only show native plants for my zone</span>
-        </label>
-        <label class="check-row">
-          <input type="checkbox" id="healingToggle">
-          <span>Show holistic healing notes (when available)</span>
-        </label>
-      </div>
-
-      <button class="btn btn-generate" id="generateBtn" onclick="generatePlan()">
-        Generate My Garden Plan
-      </button>
-    </div>
-
   </div>
 
-  <!-- RESULTS -->
-  <div id="resultsSection" class="results-section hidden">
-    <div class="results-header">
-      <h2>Your Garden Plan</h2>
-      <span class="result-count" id="resultCount"></span>
-    </div>
-    <div class="table-wrap">
-      <table id="plantsTable">
-        <thead>
-          <tr id="plantsHeaderRow"></tr>
-        </thead>
-        <tbody id="plantsBody"></tbody>
-      </table>
-    </div>
-    <div class="truncated-note" id="truncatedNote"></div>
-  </div>
+  <footer>
+    © RootPlans • Hosted on GitHub Pages
+  </footer>
 
-</div><!-- /page -->
+  <script>
+    /************************************************************
+     * CONFIG: set your AI proxy endpoint here.
+     * This endpoint must accept POST JSON and return { text: "..." }.
+     ************************************************************/
+    const AI_PROXY_URL = "https://YOUR-PROXY-DOMAIN/generate";
 
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    /************************************************************
+     * ZIP → ZONE LOOKUP
+     * - Uses phzmapi.org (no key) for zone-by-zip
+     * - Includes an override for 17543 to avoid nonsense.
+     ************************************************************/
+    const ZONE_OVERRIDES = {
+      "17543": { zone: "7a", city: "Lititz", state: "PA", note: "Override applied for 17543." }
+    };
 
-<script>
-/* ═══════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════ */
-let userZone    = null;
-let plantsData  = [];
-let selectedTheme = null;
-let csvLoading  = false;
-let csvLoaded   = false;
+    function $(id){ return document.getElementById(id); }
 
-/* ═══════════════════════════════════════════
-   COLUMN MAPPING
-═══════════════════════════════════════════ */
-const CSV_COLUMNS = {
-  plantName:    ["Plant Name", "Plant", "Name"],
-  category:     ["Category", "Type"],
-  usdaZone:     ["USDA Zone", "Zone", "Zones"],
-  theme:        ["Theme", "Philosophy"],
-  native:       ["Native", "Is Native", "Native Plant"],
-  holisticPower:["Holistic Power", "Power", "Holistic", "Healing Power"],
-  pollinator:   ["Pollinator", "Pollinator Friendly", "Bee Friendly"]
-};
-
-function getCol(row, keys) {
-  for (const k of keys) {
-    if (row[k] !== undefined && String(row[k]).trim() !== "") return String(row[k]).trim();
-  }
-  return "";
-}
-
-function isYes(val) {
-  const v = String(val || "").trim().toLowerCase();
-  return v === "yes" || v === "y" || v === "true" || v === "1";
-}
-
-/* ═══════════════════════════════════════════
-   ZONE HELPERS — Fixed to cover zones 1–13
-═══════════════════════════════════════════ */
-function tempCtoZone(tempC) {
-  const f = (tempC * 9/5) + 32;
-  if (f < -60) return "1";
-  if (f < -50) return "2";
-  if (f < -40) return "3";
-  if (f < -30) return "4";
-  if (f < -20) return "5";
-  if (f < -10) return "6";
-  if (f <   0) return "7";
-  if (f <  10) return "8";
-  if (f <  20) return "9";
-  if (f <  30) return "10";
-  if (f <  40) return "11";
-  if (f <  50) return "12";
-  return "13";
-}
-
-/**
- * Check whether a plant's zone string covers userZone.
- * Handles:
- *   "7"            → exact
- *   "6, 7, 8"      → list
- *   "6-9"          → range
- *   "6a, 7b"       → subzone letters stripped
- */
-function zoneMatches(zoneText, userZone) {
-  if (!zoneText) return false;
-
-  const userNum = parseInt(userZone, 10);
-
-  // Normalize: strip subzone letters, split on commas/spaces
-  const parts = zoneText
-    .replace(/[a-zA-Z]/g, "")   // strip a/b subzones
-    .split(/[\s,]+/)
-    .map(s => s.trim())
-    .filter(Boolean);
-
-  for (const part of parts) {
-    // Range: "6-9"
-    if (part.includes("-")) {
-      const [lo, hi] = part.split("-").map(Number);
-      if (!isNaN(lo) && !isNaN(hi) && userNum >= lo && userNum <= hi) return true;
-    } else {
-      // Single
-      if (parseInt(part, 10) === userNum) return true;
-    }
-  }
-  return false;
-}
-
-/* ═══════════════════════════════════════════
-   UI HELPERS
-═══════════════════════════════════════════ */
-function setStatus(id, html, cls = "") {
-  const el = document.getElementById(id);
-  el.innerHTML = html;
-  el.className = "status " + cls;
-}
-
-function setBtn(id, disabled, html) {
-  const btn = document.getElementById(id);
-  btn.disabled = disabled;
-  btn.innerHTML = html;
-}
-
-/* ═══════════════════════════════════════════
-   ZIP → ZONE
-═══════════════════════════════════════════ */
-let detectInProgress = false;
-
-async function detectZone() {
-  if (detectInProgress) return;
-  const zip = document.getElementById("zip").value.trim();
-
-  if (!/^\d{5}$/.test(zip)) {
-    setStatus("zoneMessage", "Please enter a valid 5-digit ZIP.", "error");
-    return;
-  }
-
-  detectInProgress = true;
-  setBtn("detectBtn", true, `<span class="spinner"></span>Detecting…`);
-  setStatus("zoneMessage", "Looking up your location…", "loading");
-  document.getElementById("csvStatus").textContent = "";
-
-  try {
-    // 1. ZIP → lat/lon
-    const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
-    if (!zipRes.ok) throw new Error("ZIP not found. Please double-check and try again.");
-    const zipData = await zipRes.json();
-    const lat = zipData.places[0].latitude;
-    const lon = zipData.places[0].longitude;
-    const city = `${zipData.places[0]["place name"]}, ${zipData.places[0]["state abbreviation"]}`;
-
-    setStatus("zoneMessage", "Fetching historical temperature data…", "loading");
-
-    // 2. lat/lon → historical minimum temp
-    const weatherRes = await fetch(
-      `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}` +
-      `&start_date=2023-01-01&end_date=2023-12-31&daily=temperature_2m_min&timezone=auto`
-    );
-    if (!weatherRes.ok) throw new Error("Weather data unavailable. Please try again.");
-    const weatherData = await weatherRes.json();
-
-    const mins = weatherData.daily.temperature_2m_min.filter(v => v !== null);
-    if (!mins.length) throw new Error("No temperature data returned for this location.");
-
-    const absoluteMin = Math.min(...mins);
-    userZone = tempCtoZone(absoluteMin);
-
-    setStatus("zoneMessage",
-      `✓ Detected <strong>USDA Zone ${userZone}</strong> — ${city}`,
-      "success"
-    );
-
-    document.getElementById("preferences").classList.remove("hidden");
-
-    // 3. Load CSV (only once; prevent double-load)
-    if (!csvLoaded && !csvLoading) {
-      await loadCSV();
+    function cleanZip(zip){
+      return String(zip || "").trim().replace(/\D/g, "").slice(0,5);
     }
 
-  } catch (e) {
-    setStatus("zoneMessage", e.message || "Detection failed. Please try again.", "error");
-  } finally {
-    detectInProgress = false;
-    setBtn("detectBtn", false, "Detect My Zone");
-  }
-}
+    async function fetchZoneByZip(zip){
+      // Override first (prevents "Zone 9" for Lititz)
+      if (ZONE_OVERRIDES[zip]) return { ...ZONE_OVERRIDES[zip], source: "override" };
 
-/* ═══════════════════════════════════════════
-   CSV LOADING — guarded against race conditions
-═══════════════════════════════════════════ */
-function loadCSV() {
-  if (csvLoaded) return Promise.resolve();
-  if (csvLoading) return new Promise(resolve => {
-    const wait = setInterval(() => {
-      if (csvLoaded) { clearInterval(wait); resolve(); }
-    }, 100);
-  });
+      const url = `https://phzmapi.org/${zip}.json`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("Zone service unavailable");
 
-  csvLoading = true;
-  document.getElementById("csvStatus").textContent = "Loading plant database…";
+      const data = await res.json();
+      const zone = (data.zone || data.hardiness_zone || data.zone_id || "").toString().trim();
+      if (!zone) throw new Error("Zone not found");
 
-  return new Promise((resolve, reject) => {
-    Papa.parse("rootplans_master_database.csv", {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete(results) {
-        plantsData = (results.data || []).filter(r => Object.keys(r).length > 1);
-        csvLoaded  = true;
-        csvLoading = false;
-        document.getElementById("csvStatus").textContent =
-          `Plant database ready — ${plantsData.length} plants`;
-        resolve();
-      },
-      error(err) {
-        csvLoading = false;
-        document.getElementById("csvStatus").textContent =
-          "⚠ Could not load plant database (CSV not found).";
-        resolve(); // Don't reject — let the user still see the UI
+      return {
+        zone,
+        city: (data.city || data.place || "").toString().trim(),
+        state: (data.state || data.state_abbr || "").toString().trim(),
+        note: "Zone detected from zone-by-zip dataset.",
+        source: "phzmapi"
+      };
+    }
+
+    function renderZone(result, zip){
+      $("zoneBox").style.display = "block";
+      $("zoneTitle").textContent = `Detected USDA Zone ${result.zone}`;
+      $("zoneValue").textContent = result.zone;
+
+      const loc = [result.city, result.state].filter(Boolean).join(", ");
+      $("locValue").textContent = loc || "—";
+
+      $("zoneDetails").textContent = (loc ? `${loc} • ZIP ${zip}` : `ZIP ${zip}`);
+      $("zoneNote").textContent = result.note || "";
+      $("statusText").innerHTML = `Zone found: <b>${result.zone}</b>. Now pick a theme.`;
+    }
+
+    function renderZoneError(message){
+      $("zoneBox").style.display = "block";
+      $("zoneTitle").textContent = "Unable to detect USDA zone";
+      $("zoneValue").textContent = "—";
+      $("locValue").textContent = "—";
+      $("zoneDetails").textContent = message;
+      $("zoneNote").textContent = "Double-check your ZIP and try again.";
+      $("statusText").textContent = "Couldn’t detect zone. Check ZIP and retry.";
+    }
+
+    /************************************************************
+     * THEME + FUNCTIONAL FOOD TYPEAHEAD
+     ************************************************************/
+    const CONDITION_SUGGESTIONS = [
+      "inflammation",
+      "high blood pressure",
+      "cholesterol",
+      "blood sugar support",
+      "digestion / gut health",
+      "sleep support",
+      "anxiety / stress",
+      "immune support",
+      "joint support",
+      "heart health",
+      "skin health",
+      "menopause support",
+      "headaches / migraines"
+    ];
+
+    let selectedTheme = null;
+    let selectedConditions = [];
+
+    function setTheme(theme){
+      selectedTheme = theme;
+
+      document.querySelectorAll("#themeRow .pill").forEach(btn => {
+        btn.setAttribute("aria-pressed", btn.dataset.theme === theme ? "true" : "false");
+      });
+
+      $("themeBox").style.display = "block";
+      $("themeText").textContent = theme;
+
+      // Show conditions only for Functional Food
+      const show = theme === "Functional Food";
+      $("conditionsBox").style.display = show ? "block" : "none";
+
+      if (!show) {
+        selectedConditions = [];
+        renderSelectedConditions();
+      }
+    }
+
+    function renderSuggestions(filterText){
+      const row = $("suggestionsRow");
+      row.innerHTML = "";
+
+      const q = (filterText || "").toLowerCase().trim();
+      const matches = CONDITION_SUGGESTIONS
+        .filter(x => x.toLowerCase().includes(q))
+        .slice(0, 10);
+
+      matches.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "pill";
+        btn.type = "button";
+        btn.textContent = item;
+        btn.addEventListener("click", () => addCondition(item));
+        row.appendChild(btn);
+      });
+    }
+
+    function renderSelectedConditions(){
+      const row = $("selectedConditionsRow");
+      row.innerHTML = "";
+
+      if (!selectedConditions.length) {
+        const p = document.createElement("div");
+        p.className = "notice";
+        p.style.marginTop = "0";
+        p.textContent = "None selected (optional).";
+        row.appendChild(p);
+        return;
+      }
+
+      selectedConditions.forEach((c) => {
+        const chip = document.createElement("button");
+        chip.className = "chip";
+        chip.type = "button";
+        chip.textContent = `✕ ${c}`;
+        chip.title = "Click to remove";
+        chip.addEventListener("click", () => {
+          selectedConditions = selectedConditions.filter(x => x !== c);
+          renderSelectedConditions();
+        });
+        row.appendChild(chip);
+      });
+    }
+
+    function addCondition(text){
+      const c = (text || "").trim();
+      if (!c) return;
+      if (!selectedConditions.includes(c)) selectedConditions.push(c);
+      $("conditionInput").value = "";
+      renderSuggestions("");
+      renderSelectedConditions();
+    }
+
+    /************************************************************
+     * AI GENERATION (calls your proxy endpoint)
+     ************************************************************/
+    function buildUserPrompt({ zip, zone, theme, conditions }){
+      if (theme === "Functional Food") {
+        const cond = (conditions && conditions.length) ? conditions.join(", ") : "general wellness";
+        return `Create a small home garden plan for ZIP ${zip} in USDA hardiness zone ${zone || "unknown"}.
+Theme: Functional Food.
+User conditions / goals: ${cond}.
+
+Rules:
+- Prefer native or well-adapted plants when possible.
+- Include edible/usable plants with practical notes (what part is used, how to harvest, how to prepare).
+- Provide a simple layout (small yard / beds / containers).
+- Provide seasonal tasks and maintenance.
+- Provide 5 easy recipe ideas using the suggested plants.
+- Include a short safety note: this is not medical advice and people should consult a professional for health conditions.`;
+      }
+
+      return `Create a small home garden plan for ZIP ${zip} in USDA hardiness zone ${zone || "unknown"}.
+Theme: ${theme}.
+
+Include:
+- Plant list (with brief reasons)
+- Simple layout
+- Seasonal tasks and maintenance
+- Helpful tips for beginners.`;
+    }
+
+    async function callAIProxy(payload){
+      const resp = await fetch(AI_PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!resp.ok) {
+        const t = await resp.text().catch(() => "");
+        throw new Error(`AI request failed (${resp.status}). ${t}`.trim());
+      }
+      return await resp.json();
+    }
+
+    /************************************************************
+     * WIRE UP UI EVENTS
+     ************************************************************/
+    $("detectBtn").addEventListener("click", async () => {
+      const zip = cleanZip($("zipInput").value);
+      $("zipInput").value = zip;
+
+      if (zip.length !== 5){
+        renderZoneError("Please enter a valid 5-digit ZIP code.");
+        return;
+      }
+
+      $("detectBtn").disabled = true;
+      $("detectBtn").textContent = "Detecting...";
+
+      try{
+        const result = await fetchZoneByZip(zip);
+
+        // Sanity check: avoid garbage values
+        if (!/^\d{1,2}[ab]?$/.test(result.zone)){
+          throw new Error("Invalid zone format");
+        }
+
+        renderZone(result, zip);
+      }catch(e){
+        renderZoneError("Zone lookup failed. Please try again in a moment.");
+      }finally{
+        $("detectBtn").disabled = false;
+        $("detectBtn").textContent = "Detect Zone";
       }
     });
-  });
-}
 
-/* ═══════════════════════════════════════════
-   THEME SELECTION
-═══════════════════════════════════════════ */
-function selectTheme(theme, element) {
-  selectedTheme = theme;
-  document.querySelectorAll(".theme-card").forEach(c => c.classList.remove("selected"));
-  element.classList.add("selected");
-}
+    $("zipInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") $("detectBtn").click();
+    });
 
-/* ═══════════════════════════════════════════
-   GENERATE PLAN
-═══════════════════════════════════════════ */
-async function generatePlan() {
-  if (!userZone) { alert("Please detect your zone first."); return; }
-  if (!selectedTheme) { alert("Please select a garden philosophy."); return; }
+    $("resetBtn").addEventListener("click", () => {
+      $("zipInput").value = "";
+      $("zoneBox").style.display = "none";
+      $("themeBox").style.display = "none";
+      $("conditionsBox").style.display = "none";
+      $("statusText").innerHTML = `Enter a ZIP and click <b>Detect Zone</b>.`;
 
-  setBtn("generateBtn", true, `<span class="spinner"></span>Building your plan…`);
+      selectedTheme = null;
+      selectedConditions = [];
 
-  // If CSV still loading, wait
-  if (!csvLoaded) await loadCSV();
+      document.querySelectorAll("#themeRow .pill").forEach(btn => btn.setAttribute("aria-pressed","false"));
 
-  const nativeOnly    = document.getElementById("nativeOnly").checked;
-  const healingToggle = document.getElementById("healingToggle").checked;
-  const pollinatorPref= document.getElementById("pollinator").checked;
+      $("aiStatus").textContent = "";
+      $("aiOutput").style.display = "none";
+      $("aiOutput").textContent = "";
+      $("copyBtn").style.display = "none";
 
-  const themeMap = { functional: "Functional", holistic: "Holistic", traditional: "Traditional" };
-  const wantedTheme = themeMap[selectedTheme];
+      renderSuggestions("");
+      renderSelectedConditions();
+    });
 
-  let filtered = plantsData.filter(p => {
-    // Zone check (fixed: handles ranges and lists)
-    const zoneText = getCol(p, CSV_COLUMNS.usdaZone);
-    if (!zoneMatches(zoneText, userZone)) return false;
+    document.querySelectorAll("#themeRow .pill").forEach(btn => {
+      btn.addEventListener("click", () => setTheme(btn.dataset.theme));
+    });
 
-    // Theme check
-    const themeText = getCol(p, CSV_COLUMNS.theme);
-    if (themeText && themeText !== wantedTheme) return false;
-
-    // Native-only filter
-    if (nativeOnly) {
-      const nativeVal = getCol(p, CSV_COLUMNS.native);
-      if (!isYes(nativeVal)) return false;
-    }
-
-    // Pollinator filter
-    if (pollinatorPref) {
-      const pollVal = getCol(p, CSV_COLUMNS.pollinator);
-      // Only filter if the column exists; otherwise let through
-      if (pollVal && !isYes(pollVal)) return false;
-    }
-
-    return true;
-  });
-
-  setBtn("generateBtn", false, "Generate My Garden Plan");
-  displayPlants(filtered, healingToggle);
-}
-
-/* ═══════════════════════════════════════════
-   DISPLAY
-═══════════════════════════════════════════ */
-const MAX_DISPLAY = 20;
-
-function displayPlants(plants, showPower) {
-  const section   = document.getElementById("resultsSection");
-  const headerRow = document.getElementById("plantsHeaderRow");
-  const tbody     = document.getElementById("plantsBody");
-  const countEl   = document.getElementById("resultCount");
-  const noteEl    = document.getElementById("truncatedNote");
-
-  // Build header
-  headerRow.innerHTML = `
-    <th>Plant</th>
-    <th>Category</th>
-    <th>Zone(s)</th>
-    ${showPower ? "<th>Holistic Notes</th>" : ""}
-  `;
-
-  tbody.innerHTML = "";
-  noteEl.textContent = "";
-
-  if (!plants.length) {
-    tbody.innerHTML = `
-      <tr><td colspan="${showPower ? 4 : 3}">
-        <div class="empty-state">
-          <div class="icon">🔍</div>
-          <p>No plants matched your filters for Zone ${userZone}.<br>
-             Try relaxing the native-only or pollinator filters.</p>
-        </div>
-      </td></tr>`;
-    countEl.textContent = "0 plants found";
-    section.classList.remove("hidden");
-    section.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-
-  const display = plants.slice(0, MAX_DISPLAY);
-
-  display.forEach(p => {
-    const plantName = getCol(p, CSV_COLUMNS.plantName) || "(Unnamed Plant)";
-    const category  = getCol(p, CSV_COLUMNS.category);
-    const zoneText  = getCol(p, CSV_COLUMNS.usdaZone);
-    const power     = getCol(p, CSV_COLUMNS.holisticPower);
-    const isNative  = isYes(getCol(p, CSV_COLUMNS.native));
-
-    const tr = document.createElement("tr");
-
-    const nameTd = document.createElement("td");
-    nameTd.innerHTML = `<span class="plant-name"></span>`;
-    nameTd.querySelector(".plant-name").textContent = plantName;
-    if (isNative) {
-      const badge = document.createElement("span");
-      badge.className = "native-badge";
-      badge.textContent = "native";
-      nameTd.appendChild(badge);
-    }
-
-    const catTd = document.createElement("td");
-    if (category) {
-      const badge = document.createElement("span");
-      badge.className = "badge";
-      badge.textContent = category;
-      catTd.appendChild(badge);
-    }
-
-    const zoneTd = document.createElement("td");
-    zoneTd.textContent = zoneText;
-
-    tr.appendChild(nameTd);
-    tr.appendChild(catTd);
-    tr.appendChild(zoneTd);
-
-    if (showPower) {
-      const powerTd = document.createElement("td");
-      if (power) {
-        const span = document.createElement("span");
-        span.className = "power-text";
-        span.textContent = power;
-        powerTd.appendChild(span);
-      } else {
-        const span = document.createElement("span");
-        span.className = "power-missing";
-        span.textContent = "—";
-        powerTd.appendChild(span);
+    $("conditionInput").addEventListener("input", (e) => renderSuggestions(e.target.value));
+    $("conditionInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addCondition($("conditionInput").value);
       }
-      tr.appendChild(powerTd);
-    }
+    });
+    $("addConditionBtn").addEventListener("click", () => addCondition($("conditionInput").value));
 
-    tbody.appendChild(tr);
-  });
+    $("generateBtn").addEventListener("click", async () => {
+      const zip = cleanZip($("zipInput").value);
+      const zone = ($("zoneValue").textContent || "").trim();
 
-  countEl.textContent = `${plants.length} plant${plants.length !== 1 ? "s" : ""} found`;
+      $("aiOutput").style.display = "none";
+      $("aiOutput").textContent = "";
+      $("copyBtn").style.display = "none";
 
-  if (plants.length > MAX_DISPLAY) {
-    noteEl.textContent = `Showing ${MAX_DISPLAY} of ${plants.length} matching plants.`;
-  }
+      if (zip.length !== 5){
+        $("aiStatus").textContent = "Enter a valid ZIP first, then click Detect Zone.";
+        return;
+      }
+      if (!zone || zone === "—"){
+        $("aiStatus").textContent = "Click Detect Zone first.";
+        return;
+      }
+      if (!selectedTheme){
+        $("aiStatus").textContent = "Pick a theme first.";
+        return;
+      }
+      if (AI_PROXY_URL.includes("YOUR-PROXY-DOMAIN")){
+        $("aiStatus").textContent = "Set AI_PROXY_URL in the code first (search for AI_PROXY_URL).";
+        return;
+      }
 
-  section.classList.remove("hidden");
-  setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-}
-</script>
+      const userPrompt = buildUserPrompt({
+        zip,
+        zone,
+        theme: selectedTheme,
+        conditions: (selectedTheme === "Functional Food") ? selectedConditions : []
+      });
+
+      $("aiStatus").textContent = "Generating…";
+      $("generateBtn").disabled = true;
+      $("generateBtn").textContent = "Working…";
+
+      try{
+        const data = await callAIProxy({
+          zip,
+          zone,
+          theme: selectedTheme,
+          conditions: (selectedTheme === "Functional Food") ? selectedConditions : [],
+          prompt: userPrompt
+        });
+
+        const text = data.text || data.output || JSON.stringify(data, null, 2);
+        $("aiOutput").style.display = "block";
+        $("aiOutput").textContent = text;
+        $("aiStatus").textContent = "Done.";
+        $("copyBtn").style.display = "inline-block";
+      }catch(e){
+        $("aiStatus").textContent = "AI failed. Check your proxy URL + CORS, then try again.";
+      }finally{
+        $("generateBtn").disabled = false;
+        $("generateBtn").textContent = "Generate with AI";
+      }
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      const text = $("aiOutput").textContent || "";
+      try{
+        await navigator.clipboard.writeText(text);
+        $("aiStatus").textContent = "Copied to clipboard.";
+        setTimeout(() => $("aiStatus").textContent = "Done.", 1200);
+      }catch(e){
+        $("aiStatus").textContent = "Copy failed (browser blocked it). You can manually select + copy.";
+      }
+    });
+
+    // Initial render
+    renderSuggestions("");
+    renderSelectedConditions();
+  </script>
 </body>
 </html>
