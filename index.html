@@ -2,55 +2,183 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RootPlans | Intelligent Garden Design</title>
+  <title>RootPlans | Intelligent Garden Planning</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    :root {
+      --bg: #f4f6f2;
+      --surface: rgba(255, 255, 255, 0.86);
+      --surface-strong: #ffffff;
+      --border: rgba(36, 62, 42, 0.1);
+      --border-strong: rgba(36, 62, 42, 0.16);
+      --text: #1f2b22;
+      --muted: #5e6d62;
+      --primary: #274c38;
+      --primary-2: #3e6a50;
+      --primary-soft: #edf4ef;
+      --shadow: 0 18px 48px rgba(22, 34, 26, 0.08);
+      --radius: 20px;
+      --radius-sm: 14px;
+      --max: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
-      background: #f6f8f5;
-      color: #2c3e2f;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(100, 140, 108, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(63, 113, 85, 0.08), transparent 24%),
+        linear-gradient(180deg, #f7f9f6 0%, var(--bg) 100%);
+      color: var(--text);
     }
 
-    header {
-      background: linear-gradient(135deg, #2f5d34, #4e8b54);
-      color: white;
-      padding: 60px 20px;
-      text-align: center;
+    .shell {
+      min-height: 100vh;
+      padding: 32px 20px 60px;
     }
 
-    header h1 {
-      font-size: 42px;
+    .hero {
+      max-width: var(--max);
+      margin: 0 auto 28px;
+      padding: 38px 40px;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(31, 59, 43, 0.96), rgba(54, 92, 69, 0.92));
+      color: #fff;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,0.16), transparent 18%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08), transparent 22%);
+      pointer-events: none;
+    }
+
+    .heroInner {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .hero p {
       margin: 0;
-      letter-spacing: 0.2px;
+      font-size: 17px;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.9);
+      max-width: 680px;
     }
 
-    header p {
-      font-size: 18px;
-      opacity: 0.92;
-      margin-top: 10px;
-      margin-bottom: 0;
+    .app {
+      max-width: var(--max);
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 40px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    .appHeader {
+      padding: 26px 32px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.55);
     }
 
-    h2 {
-      margin-top: 0;
-      font-size: 22px;
+    .appHeader h2 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+
+    .appHeader p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .content {
+      padding: 12px 32px 32px;
+      display: grid;
+      gap: 18px;
     }
 
     .section {
-      margin-top: 28px;
-      padding-top: 18px;
-      border-top: 1px solid #e8efe8;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.72);
+    }
+
+    .sectionHeader {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .step {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+      border: 1px solid rgba(39, 76, 56, 0.12);
+    }
+
+    .sectionHeaderText h3 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .sectionHeaderText p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
     .row {
@@ -63,313 +191,400 @@
     .input {
       flex: 1;
       min-width: 220px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid #dde7de;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-strong);
       font-size: 16px;
+      color: var(--text);
       outline: none;
-      background: #fbfdfb;
+      background: rgba(255,255,255,0.92);
+      transition: 0.18s ease;
     }
 
     .input:focus {
-      border-color: #b9d4bf;
-      box-shadow: 0 0 0 4px rgba(185, 212, 191, 0.25);
-      background: #fff;
+      border-color: rgba(39, 76, 56, 0.38);
+      box-shadow: 0 0 0 5px rgba(39, 76, 56, 0.08);
+    }
+
+    .btn,
+    .btnSecondary {
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+      border: 1px solid transparent;
     }
 
     .btn {
-      background: linear-gradient(135deg, #2f5d34, #4e8b54);
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
       color: #fff;
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.05s ease-in-out;
+      box-shadow: 0 10px 24px rgba(39, 76, 56, 0.18);
     }
 
-    .btn:active {
-      transform: translateY(1px);
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(39, 76, 56, 0.22);
     }
 
     .btn:disabled {
-      opacity: 0.6;
+      opacity: 0.66;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .btnSecondary {
-      background: #eef5ef;
-      color: #2c3e2f;
-      border: 1px solid #dde7de;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
+      background: rgba(255,255,255,0.9);
+      color: var(--text);
+      border-color: var(--border-strong);
     }
 
-    .subtext {
-      color: #5a6a5f;
-      margin: 10px 0 0;
-      line-height: 1.4;
+    .btnSecondary:hover {
+      background: #fff;
+      border-color: rgba(39, 76, 56, 0.22);
+    }
+
+    .statusLine {
+      margin-top: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
     }
 
     .resultCard {
-      margin-top: 14px;
-      padding: 16px;
-      border-radius: 14px;
-      border: 1px solid #e6eee6;
-      background: #fbfdfb;
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(248,251,248,0.94));
     }
 
     .resultTitle {
-      margin: 0 0 6px;
-      font-size: 20px;
-      font-weight: 900;
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
 
     .resultLine {
       margin: 0;
-      color: #5a6a5f;
-      line-height: 1.4;
-    }
-
-    .pillRow {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
-    .pill {
-      border: 1px solid #dde7de;
-      background: #f3f8f3;
-      padding: 10px 12px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 800;
-      color: #2c3e2f;
-    }
-
-    .pill[aria-pressed="true"] {
-      background: #e1f0e4;
-      border-color: #b9d4bf;
-    }
-
-    .chip {
-      border: 1px solid #dde7de;
-      background: #ffffff;
-      padding: 9px 11px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 800;
-      color: #2c3e2f;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
     .tinyNote {
       margin-top: 10px;
       font-size: 13px;
-      color: #5a6a5f;
-      line-height: 1.4;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .pillRow {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .pill {
+      border: 1px solid var(--border-strong);
+      background: rgba(255,255,255,0.92);
+      padding: 12px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text);
+      transition: 0.18s ease;
+    }
+
+    .pill:hover {
+      border-color: rgba(39, 76, 56, 0.28);
+      background: #fff;
+    }
+
+    .pill[aria-pressed="true"] {
+      background: var(--primary-soft);
+      border-color: rgba(39, 76, 56, 0.28);
+      color: var(--primary);
+    }
+
+    .chip {
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+      border: 0;
     }
 
     .checkboxStack {
       display: grid;
-      gap: 12px;
-      margin-top: 14px;
+      gap: 14px;
     }
 
     .checkboxCard {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      padding: 14px;
-      border: 1px solid #dde7de;
-      border-radius: 14px;
-      background: #fbfdfb;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.9);
+      transition: 0.18s ease;
+    }
+
+    .checkboxCard:hover {
+      border-color: rgba(39, 76, 56, 0.18);
+      background: #fff;
     }
 
     .checkboxCard input[type="checkbox"] {
       margin-top: 3px;
       transform: scale(1.15);
-      accent-color: #2f5d34;
+      accent-color: var(--primary);
     }
 
     .checkboxLabel {
-      font-weight: 800;
       margin: 0;
-      color: #2c3e2f;
+      font-weight: 800;
+      letter-spacing: -0.01em;
     }
 
     .checkboxHelp {
-      margin: 4px 0 0;
-      color: #5a6a5f;
+      margin: 6px 0 0;
+      color: var(--muted);
       font-size: 13px;
-      line-height: 1.4;
-    }
-
-    pre {
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid #e6eee6;
-      background: #ffffff;
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-height: 520px;
-      overflow: auto;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 30px 10px 50px;
-      color: #5a6a5f;
-      font-size: 13px;
-    }
-
-    .divider {
-      height: 1px;
-      background: #e8efe8;
-      margin: 18px 0;
-      border: 0;
-    }
-
-    .statusLine {
-      margin-top: 10px;
-      font-weight: 700;
-      color: #2c3e2f;
+      line-height: 1.5;
     }
 
     .summaryList {
       margin: 12px 0 0;
-      padding-left: 20px;
-      color: #5a6a5f;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    pre {
+      margin-top: 14px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: #fff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 620px;
+      overflow: auto;
+      line-height: 1.62;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .footer {
+      max-width: var(--max);
+      margin: 20px auto 0;
+      padding: 0 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 16px 14px 36px;
+      }
+
+      .hero {
+        padding: 28px 22px;
+        border-radius: 22px;
+      }
+
+      .appHeader,
+      .content {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .section {
+        padding: 18px;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>RootPlans</h1>
-    <p>Intelligent garden design — tailored to your location and goals.</p>
-  </header>
+  <div class="shell">
+    <section class="hero">
+      <div class="heroInner">
+        <div class="eyebrow">RootPlans • Intelligent Garden Planning</div>
+        <h1>Design a garden that fits your zone, goals, and style.</h1>
+        <p>
+          Generate a polished planting plan based on your ZIP code, garden theme, native-plant preference,
+          and optional holistic plant guidance — without exposing your API key.
+        </p>
+      </div>
+    </section>
 
-  <div class="container">
-    <h2>Start your plan</h2>
-    <p class="subtext">
-      Enter your ZIP, pick a theme, choose your preferences, and generate a custom garden plan.
-    </p>
-
-    <div class="section">
-      <h2>1) Enter your ZIP code</h2>
-      <div class="row">
-        <input id="zipInput" class="input" inputmode="numeric" maxlength="5" placeholder="e.g., 17543" />
-        <button id="detectBtn" class="btn" type="button">Detect Zone</button>
-        <button id="resetBtn" class="btnSecondary" type="button">Reset</button>
+    <main class="app">
+      <div class="appHeader">
+        <h2>Build your plan</h2>
+        <p>
+          Start with your ZIP, choose the kind of garden you want, set your preferences, and generate a
+          custom plan powered by your secure AI proxy.
+        </p>
       </div>
 
-      <div id="zoneCard" class="resultCard" style="display:none;">
-        <p class="resultTitle" id="zoneTitle">Detected USDA Zone</p>
-        <p class="resultLine" id="zoneDetails"></p>
-        <p class="tinyNote" id="zoneNote"></p>
-      </div>
-
-      <div class="statusLine" id="statusText">Status: Enter a ZIP and click Detect Zone.</div>
-    </div>
-
-    <div class="section">
-      <h2>2) Pick your garden theme</h2>
-      <div class="pillRow" id="themeRow">
-        <button class="pill" type="button" data-theme="Functional Food" aria-pressed="false">Functional Food</button>
-        <button class="pill" type="button" data-theme="Pollinator Paradise" aria-pressed="false">Pollinator Paradise</button>
-        <button class="pill" type="button" data-theme="Low-Maintenance Beauty" aria-pressed="false">Low-Maintenance Beauty</button>
-      </div>
-
-      <div id="themeCard" class="resultCard" style="display:none;">
-        <p class="resultTitle" style="margin-bottom:6px;">Selected theme</p>
-        <p class="resultLine" id="themeText"></p>
-      </div>
-
-      <div id="conditionsCard" class="resultCard" style="display:none;">
-        <p class="resultTitle" style="margin-bottom:6px;">Functional Food focus</p>
-        <p class="resultLine" style="margin-bottom:10px;">Type a condition and pick a suggestion (or add your own).</p>
-
-        <div class="row">
-          <input id="conditionInput" class="input" placeholder="Start typing (ex: inflammation, cholesterol)" />
-          <button id="addConditionBtn" class="btnSecondary" type="button">Add</button>
-        </div>
-
-        <div class="pillRow" id="suggestionsRow" style="margin-top:12px;"></div>
-
-        <hr class="divider" />
-
-        <div class="tinyNote" style="margin-top:0;">Selected (click to remove):</div>
-        <div class="pillRow" id="selectedConditionsRow" style="margin-top:10px;"></div>
-
-        <div class="tinyNote">
-          Safety note: the plan can include food + traditional uses, but it’s not medical advice.
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>3) Plan preferences</h2>
-
-      <div class="checkboxStack">
-        <label class="checkboxCard">
-          <input type="checkbox" id="nativeOnlyCheckbox" />
-          <div>
-            <p class="checkboxLabel">Only native plants for my zone</p>
-            <p class="checkboxHelp">
-              Tells AI to limit recommendations to native plants that fit the user’s USDA zone whenever possible.
-            </p>
+      <div class="content">
+        <section class="section">
+          <div class="sectionHeader">
+            <div class="step">1</div>
+            <div class="sectionHeaderText">
+              <h3>Find your USDA zone</h3>
+              <p>We’ll use your ZIP code to detect the growing zone and tailor the plan.</p>
+            </div>
           </div>
-        </label>
 
-        <label class="checkboxCard">
-          <input type="checkbox" id="holisticHealingCheckbox" />
-          <div>
-            <p class="checkboxLabel">Include holistic healing powers</p>
-            <p class="checkboxHelp">
-              Adds traditional uses, “power” descriptions, and practical notes for each suggested plant using cautious language.
-            </p>
+          <div class="row">
+            <input id="zipInput" class="input" inputmode="numeric" maxlength="5" placeholder="Enter 5-digit ZIP code" />
+            <button id="detectBtn" class="btn" type="button">Detect Zone</button>
+            <button id="resetBtn" class="btnSecondary" type="button">Reset</button>
           </div>
-        </label>
-      </div>
 
-      <div id="preferenceCard" class="resultCard" style="display:none;">
-        <p class="resultTitle" style="margin-bottom:8px;">Current plan preferences</p>
-        <ul class="summaryList" id="preferenceSummary"></ul>
+          <div id="zoneCard" class="resultCard" style="display:none;">
+            <p class="resultTitle" id="zoneTitle">Detected USDA Zone</p>
+            <p class="resultLine" id="zoneDetails"></p>
+            <p class="tinyNote" id="zoneNote"></p>
+          </div>
+
+          <div class="statusLine" id="statusText">Status: Enter a ZIP and click Detect Zone.</div>
+        </section>
+
+        <section class="section">
+          <div class="sectionHeader">
+            <div class="step">2</div>
+            <div class="sectionHeaderText">
+              <h3>Select your garden direction</h3>
+              <p>Choose the plan type you want the AI to build around.</p>
+            </div>
+          </div>
+
+          <div class="pillRow" id="themeRow">
+            <button class="pill" type="button" data-theme="Functional Food" aria-pressed="false">Functional Food</button>
+            <button class="pill" type="button" data-theme="Pollinator Paradise" aria-pressed="false">Pollinator Paradise</button>
+            <button class="pill" type="button" data-theme="Low-Maintenance Beauty" aria-pressed="false">Low-Maintenance Beauty</button>
+          </div>
+
+          <div id="themeCard" class="resultCard" style="display:none;">
+            <p class="resultTitle">Selected theme</p>
+            <p class="resultLine" id="themeText"></p>
+          </div>
+
+          <div id="conditionsCard" class="resultCard" style="display:none;">
+            <p class="resultTitle">Functional Food focus</p>
+            <p class="resultLine">Type a condition and pick a suggestion, or add your own.</p>
+
+            <div class="row" style="margin-top:14px;">
+              <input id="conditionInput" class="input" placeholder="Examples: inflammation, cholesterol, sleep support" />
+              <button id="addConditionBtn" class="btnSecondary" type="button">Add</button>
+            </div>
+
+            <div class="pillRow" id="suggestionsRow" style="margin-top:14px;"></div>
+
+            <hr class="divider" />
+
+            <div class="tinyNote" style="margin-top:0;">Selected items (click one to remove):</div>
+            <div class="pillRow" id="selectedConditionsRow" style="margin-top:10px;"></div>
+
+            <div class="tinyNote">
+              Safety note: this can include food plants and traditional uses, but it is not medical advice.
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="sectionHeader">
+            <div class="step">3</div>
+            <div class="sectionHeaderText">
+              <h3>Set your plan preferences</h3>
+              <p>These options change the prompt sent to your AI proxy.</p>
+            </div>
+          </div>
+
+          <div class="checkboxStack">
+            <label class="checkboxCard">
+              <input type="checkbox" id="nativeOnlyCheckbox" />
+              <div>
+                <p class="checkboxLabel">Only native plants for my zone</p>
+                <p class="checkboxHelp">
+                  Restricts the plan to native plants suitable for the user’s USDA zone whenever possible.
+                </p>
+              </div>
+            </label>
+
+            <label class="checkboxCard">
+              <input type="checkbox" id="holisticHealingCheckbox" />
+              <div>
+                <p class="checkboxLabel">Include holistic healing powers</p>
+                <p class="checkboxHelp">
+                  Adds traditional uses and “power” notes for each plant using cautious, non-medical language.
+                </p>
+              </div>
+            </label>
+          </div>
+
+          <div id="preferenceCard" class="resultCard" style="display:none;">
+            <p class="resultTitle">Current plan settings</p>
+            <ul class="summaryList" id="preferenceSummary"></ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="sectionHeader">
+            <div class="step">4</div>
+            <div class="sectionHeaderText">
+              <h3>Generate your plan</h3>
+              <p>
+                This sends the prompt to your secure Vercel proxy, not directly to Anthropic from the browser.
+              </p>
+            </div>
+          </div>
+
+          <div class="row">
+            <button id="generateBtn" class="btn" type="button">Generate Plan</button>
+            <button id="copyBtn" class="btnSecondary" type="button" style="display:none;">Copy</button>
+          </div>
+
+          <div class="tinyNote" id="aiStatus" style="margin-top:12px;"></div>
+          <pre id="aiOutput" style="display:none;"></pre>
+        </section>
       </div>
+    </main>
+
+    <div class="footer">
+      © RootPlans • Hosted on GitHub Pages
     </div>
-
-    <div class="section">
-      <h2>4) Generate your plan (AI)</h2>
-      <p class="subtext">
-        This calls your server-side AI proxy, so your API key is not exposed in the browser.
-      </p>
-
-      <div class="row">
-        <button id="generateBtn" class="btn" type="button">Generate Plan</button>
-        <button id="copyBtn" class="btnSecondary" type="button" style="display:none;">Copy</button>
-      </div>
-
-      <div class="tinyNote" id="aiStatus" style="margin-top:12px;"></div>
-      <pre id="aiOutput" style="display:none;"></pre>
-    </div>
-  </div>
-
-  <div class="footer">
-    © RootPlans • Hosted on GitHub Pages
   </div>
 
   <script>
     /************************************************************
      * CONFIG
-     * Replace this only if your Vercel URL changes.
+     * Make sure this matches the Vercel project that actually deployed.
      ************************************************************/
-    const AI_PROXY_URL = "https://rootplans-ai-proxy.vercel.app/api/holistic";
+    const AI_PROXY_URL = "https://rootplans-proxy.vercel.app/api/holistic";
 
     /************************************************************
      * HELPERS
@@ -451,7 +666,6 @@
 
     function renderZoneOk(result, zip) {
       const loc = [result.city, result.state].filter(Boolean).join(", ");
-
       $("zoneCard").style.display = "block";
       $("zoneTitle").textContent = `Detected USDA Zone ${result.zone}`;
       $("zoneDetails").textContent = loc ? `${loc} • ZIP ${zip}` : `ZIP ${zip}`;
@@ -567,21 +781,9 @@
       const { nativeOnly, holisticHealing } = getPreferenceState();
       const items = [];
 
-      if (selectedTheme) {
-        items.push(`Theme: ${selectedTheme}`);
-      }
-
-      if (nativeOnly) {
-        items.push("Only native plants for this zone");
-      } else {
-        items.push("Native plants preferred when practical, but not required");
-      }
-
-      if (holisticHealing) {
-        items.push("Include holistic healing powers / traditional uses");
-      } else {
-        items.push("Focus on planting plan without healing-power details");
-      }
+      if (selectedTheme) items.push(`Theme: ${selectedTheme}`);
+      items.push(nativeOnly ? "Only native plants for this zone" : "Native plants preferred when practical, but not required");
+      items.push(holisticHealing ? "Include holistic healing powers / traditional uses" : "Focus on planting plan without healing-power details");
 
       if (selectedTheme === "Functional Food") {
         if (selectedConditions.length) {
@@ -601,60 +803,102 @@
     function buildUserPrompt() {
       const zip = detected.zip || cleanZip($("zipInput").value);
       const zone = detected.zone || "";
-      const locationLine = detected.location ? `Location: ${detected.location}.` : "";
+      const locationLine = detected.location ? `Location: ${detected.location}.` : "Location not specified.";
       const { nativeOnly, holisticHealing } = getPreferenceState();
 
-      let rules = [
-        `Create a small home garden plan for ZIP ${zip} in USDA hardiness zone ${zone}.`,
-        locationLine,
-        `Theme: ${selectedTheme}.`
-      ].filter(Boolean);
+      const conditionText =
+        selectedTheme === "Functional Food"
+          ? (selectedConditions.length ? selectedConditions.join(", ") : "general wellness")
+          : "";
 
-      if (nativeOnly) {
-        rules.push("Use only native plants that fit this USDA zone.");
-      } else {
-        rules.push("Prefer native or well-adapted plants when practical.");
-      }
+      return `
+You are RootPlans, an expert garden designer specializing in small home gardens, edible landscapes, pollinator support, and holistic plant planning.
 
-      if (holisticHealing) {
-        rules.push("For each plant, include its traditional holistic use or 'power' using cautious wording such as 'traditionally used for...' and avoid medical claims.");
-      } else {
-        rules.push("Do not emphasize medicinal or healing properties unless they are briefly relevant.");
-      }
+Create a practical, beautiful, beginner-friendly garden plan for:
+- ZIP: ${zip}
+- USDA Zone: ${zone}
+- ${locationLine}
+- Theme: ${selectedTheme}
+- Native plants only: ${nativeOnly ? "Yes" : "No"}
+- Include holistic healing powers: ${holisticHealing ? "Yes" : "No"}
+${selectedTheme === "Functional Food" ? `- Functional focus: ${conditionText}` : ""}
 
-      if (selectedTheme === "Functional Food") {
-        const cond = selectedConditions.length ? selectedConditions.join(", ") : "general wellness";
-        rules.push(`User conditions / goals: ${cond}.`);
-        rules.push("Include edible or usable plants with practical notes about what part is used, how to harvest, and how to prepare.");
-        rules.push("Provide a simple layout for a small yard, raised bed, or containers.");
-        rules.push("Provide seasonal tasks and maintenance.");
-        rules.push("Provide 5 easy recipe or use ideas using the suggested plants.");
-        rules.push("End with a short safety note that this is not medical advice.");
-      } else if (selectedTheme === "Pollinator Paradise") {
-        rules.push("Focus on pollinator support, bloom succession, biodiversity, and simple maintenance.");
-        rules.push("Include a simple layout, bloom timing, and beginner tips.");
-      } else if (selectedTheme === "Low-Maintenance Beauty") {
-        rules.push("Focus on visually appealing, easy-care plants with low-maintenance planning.");
-        rules.push("Include a simple layout, seasonal interest, and beginner tips.");
-      }
+Follow these rules carefully:
+1. Make the plan realistic for a homeowner with a small yard, raised beds, or containers.
+2. If native plants only = Yes, use only native plants appropriate for the zone when possible.
+3. If native plants only = No, prefer native plants first, then include well-adapted plants if needed.
+4. If holistic healing powers = Yes, include a short cautious note for each plant using language like:
+   - "traditionally used for..."
+   - "commonly valued for..."
+   - "often associated with..."
+   Do NOT make medical claims and do NOT present medical advice.
+5. Keep the recommendations beginner-friendly and practical.
+6. Do not suggest invasive plants.
+7. Include only plants that are realistic for the stated zone.
 
-      rules.push("Format the answer with clear sections and bullet points where helpful.");
-      return rules.join("\n");
+Return the answer in this exact structure:
+
+1. GARDEN CONCEPT
+Give a short paragraph describing the overall feel and purpose of the garden.
+
+2. RECOMMENDED PLANTS
+Provide 8-12 plants in a clean bullet list.
+For each plant include:
+- Common name
+- Botanical name
+- Why it fits this garden
+${holisticHealing ? '- Traditional holistic use / "power" (1 short line, cautious wording only)' : ''}
+- Sun needs
+- Water needs
+- Best use (bed, border, container, pollinator support, edible use, etc.)
+
+3. SIMPLE LAYOUT
+Give a simple layout for a small home garden using plain English.
+Include:
+- back row
+- middle row
+- front row
+- container option if helpful
+
+4. SEASONAL CARE PLAN
+Break out by:
+- Spring
+- Summer
+- Fall
+- Winter
+
+5. HARVEST / USE IDEAS
+If the theme is Functional Food, include 5 simple ways to use the plants in food, tea, garnish, or home use.
+
+6. BEGINNER TIPS
+Give 5 practical beginner tips.
+
+7. SAFETY NOTE
+End with a short note that this plan is educational and not medical advice.
+
+Make it polished, easy to read, and helpful for a real customer.
+      `.trim();
     }
 
     async function callAIProxy(payload) {
-      const resp = await fetch(AI_PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+  const resp = await fetch(AI_PROXY_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-      if (!resp.ok) {
-        const t = await resp.text().catch(() => "");
-        throw new Error(`AI request failed (${resp.status}). ${t}`.trim());
-      }
+  const raw = await resp.text();
 
-      return await resp.json();
+  if (!resp.ok) {
+    throw new Error(raw || `Request failed with status ${resp.status}`);
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error("Proxy returned invalid JSON");
+  }
+}
     }
 
     /************************************************************
@@ -693,9 +937,7 @@
     });
 
     $("zipInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        $("detectBtn").click();
-      }
+      if (e.key === "Enter") $("detectBtn").click();
     });
 
     $("resetBtn").addEventListener("click", () => {
@@ -743,7 +985,6 @@
     });
 
     $("addConditionBtn").addEventListener("click", () => addCondition($("conditionInput").value));
-
     $("nativeOnlyCheckbox").addEventListener("change", updatePreferenceSummary);
     $("holisticHealingCheckbox").addEventListener("change", updatePreferenceSummary);
 
@@ -794,12 +1035,12 @@
 
         const text = data.text || data.output || JSON.stringify(data, null, 2);
         $("aiOutput").style.display = "block";
-        $("aiOutput").textContent = text;
+        $("aiOutput").textContent = text.trim();
         $("aiStatus").textContent = "Done.";
         $("copyBtn").style.display = "inline-block";
       } catch (e) {
         console.error(e);
-        $("aiStatus").textContent = "AI failed. Check your proxy URL, Vercel deploy, and CORS settings, then try again.";
+        $("aiStatus").textContent = `AI failed: ${e.message || "Unknown error"}`;
       } finally {
         $("generateBtn").disabled = false;
         $("generateBtn").textContent = "Generate Plan";
