@@ -294,7 +294,11 @@
      * Replace with your Cloudflare Worker / Vercel / Netlify endpoint:
      * Example: https://rootplans-ai.yourname.workers.dev/generate
      ************************************************************/
-    const AI_PROXY_URL = "https://YOUR-PROXY-DOMAIN/generate";
+    const AI_PROXY_URL = "https://rootplans-ai-proxy.vercel.app/api/holistic";
+    
+    let userZone = null;
+    let plantsData = [];
+    let selectedTheme = null;
 
     /************************************************************
      * ZONE LOOKUP
