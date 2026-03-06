@@ -70,6 +70,7 @@
       outline: none;
       background: #fbfdfb;
     }
+
     .input:focus {
       border-color: #b9d4bf;
       box-shadow: 0 0 0 4px rgba(185, 212, 191, 0.25);
@@ -87,8 +88,15 @@
       cursor: pointer;
       transition: transform 0.05s ease-in-out;
     }
-    .btn:active { transform: translateY(1px); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
     .btnSecondary {
       background: #eef5ef;
@@ -143,6 +151,7 @@
       font-weight: 800;
       color: #2c3e2f;
     }
+
     .pill[aria-pressed="true"] {
       background: #e1f0e4;
       border-color: #b9d4bf;
@@ -162,6 +171,41 @@
       margin-top: 10px;
       font-size: 13px;
       color: #5a6a5f;
+      line-height: 1.4;
+    }
+
+    .checkboxStack {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .checkboxCard {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #dde7de;
+      border-radius: 14px;
+      background: #fbfdfb;
+    }
+
+    .checkboxCard input[type="checkbox"] {
+      margin-top: 3px;
+      transform: scale(1.15);
+      accent-color: #2f5d34;
+    }
+
+    .checkboxLabel {
+      font-weight: 800;
+      margin: 0;
+      color: #2c3e2f;
+    }
+
+    .checkboxHelp {
+      margin: 4px 0 0;
+      color: #5a6a5f;
+      font-size: 13px;
       line-height: 1.4;
     }
 
@@ -191,11 +235,16 @@
       border: 0;
     }
 
-    /* Small “status” line */
     .statusLine {
       margin-top: 10px;
       font-weight: 700;
       color: #2c3e2f;
+    }
+
+    .summaryList {
+      margin: 12px 0 0;
+      padding-left: 20px;
+      color: #5a6a5f;
     }
   </style>
 </head>
@@ -209,10 +258,9 @@
   <div class="container">
     <h2>Start your plan</h2>
     <p class="subtext">
-      Enter your ZIP, pick a theme, and (if you choose <b>Functional Food</b>) add the conditions you want your garden to support.
+      Enter your ZIP, pick a theme, choose your preferences, and generate a custom garden plan.
     </p>
 
-    <!-- 1) ZIP -->
     <div class="section">
       <h2>1) Enter your ZIP code</h2>
       <div class="row">
@@ -230,7 +278,6 @@
       <div class="statusLine" id="statusText">Status: Enter a ZIP and click Detect Zone.</div>
     </div>
 
-    <!-- 2) Theme -->
     <div class="section">
       <h2>2) Pick your garden theme</h2>
       <div class="pillRow" id="themeRow">
@@ -244,7 +291,6 @@
         <p class="resultLine" id="themeText"></p>
       </div>
 
-      <!-- Functional Food: conditions -->
       <div id="conditionsCard" class="resultCard" style="display:none;">
         <p class="resultTitle" style="margin-bottom:6px;">Functional Food focus</p>
         <p class="resultLine" style="margin-bottom:10px;">Type a condition and pick a suggestion (or add your own).</p>
@@ -267,11 +313,41 @@
       </div>
     </div>
 
-    <!-- 3) AI Generation -->
     <div class="section">
-      <h2>3) Generate your plan (AI)</h2>
+      <h2>3) Plan preferences</h2>
+
+      <div class="checkboxStack">
+        <label class="checkboxCard">
+          <input type="checkbox" id="nativeOnlyCheckbox" />
+          <div>
+            <p class="checkboxLabel">Only native plants for my zone</p>
+            <p class="checkboxHelp">
+              Tells AI to limit recommendations to native plants that fit the user’s USDA zone whenever possible.
+            </p>
+          </div>
+        </label>
+
+        <label class="checkboxCard">
+          <input type="checkbox" id="holisticHealingCheckbox" />
+          <div>
+            <p class="checkboxLabel">Include holistic healing powers</p>
+            <p class="checkboxHelp">
+              Adds traditional uses, “power” descriptions, and practical notes for each suggested plant using cautious language.
+            </p>
+          </div>
+        </label>
+      </div>
+
+      <div id="preferenceCard" class="resultCard" style="display:none;">
+        <p class="resultTitle" style="margin-bottom:8px;">Current plan preferences</p>
+        <ul class="summaryList" id="preferenceSummary"></ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>4) Generate your plan (AI)</h2>
       <p class="subtext">
-        This calls your server-side AI proxy (so your API key is not exposed). In the code, search for <b>AI_PROXY_URL</b> and set it.
+        This calls your server-side AI proxy, so your API key is not exposed in the browser.
       </p>
 
       <div class="row">
@@ -291,72 +367,37 @@
   <script>
     /************************************************************
      * CONFIG
-     * Replace with your Cloudflare Worker / Vercel / Netlify endpoint:
-     * Example: https://rootplans-ai.yourname.workers.dev/generate
+     * Replace this only if your Vercel URL changes.
      ************************************************************/
     const AI_PROXY_URL = "https://rootplans-ai-proxy.vercel.app/api/holistic";
-    
-    let userZone = null;
-    let plantsData = [];
-    let selectedTheme = null;
 
     /************************************************************
-     * ZONE LOOKUP
-     * - Uses phzmapi.org (no key) for zone-by-zip
-     * - Includes override for 17543 to prevent incorrect results
+     * HELPERS
+     ************************************************************/
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function cleanZip(zip) {
+      return String(zip || "").trim().replace(/\D/g, "").slice(0, 5);
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    /************************************************************
+     * STATE
      ************************************************************/
     const ZONE_OVERRIDES = {
       "17543": { zone: "7a", city: "Lititz", state: "PA", note: "Override applied for 17543." }
     };
 
-    function $(id){ return document.getElementById(id); }
-
-    function cleanZip(zip){
-      return String(zip || "").trim().replace(/\D/g, "").slice(0,5);
-    }
-
-    async function fetchZoneByZip(zip){
-      if (ZONE_OVERRIDES[zip]) {
-        return { ...ZONE_OVERRIDES[zip], source: "override" };
-      }
-
-      const url = `https://phzmapi.org/${zip}.json`;
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Zone service unavailable");
-
-      const data = await res.json();
-      const zone = (data.zone || data.hardiness_zone || data.zone_id || "").toString().trim();
-      if (!zone) throw new Error("Zone not found");
-
-      return {
-        zone,
-        city: (data.city || data.place || "").toString().trim(),
-        state: (data.state || data.state_abbr || "").toString().trim(),
-        note: "Zone detected from zone-by-zip dataset.",
-        source: "phzmapi"
-      };
-    }
-
-    function renderZoneOk(result, zip){
-      const loc = [result.city, result.state].filter(Boolean).join(", ");
-      $("zoneCard").style.display = "block";
-      $("zoneTitle").textContent = `Detected USDA Zone ${result.zone}`;
-      $("zoneDetails").textContent = (loc ? `${loc} • ZIP ${zip}` : `ZIP ${zip}`);
-      $("zoneNote").textContent = result.note || "";
-      $("statusText").textContent = `Status: Zone found (${result.zone}). Pick a theme.`;
-    }
-
-    function renderZoneError(message){
-      $("zoneCard").style.display = "block";
-      $("zoneTitle").textContent = "Unable to detect USDA zone";
-      $("zoneDetails").textContent = message;
-      $("zoneNote").textContent = "Double-check your ZIP and try again.";
-      $("statusText").textContent = "Status: Zone detection failed.";
-    }
-
-    /************************************************************
-     * THEMES + CONDITIONS (type-ahead)
-     ************************************************************/
     const CONDITION_SUGGESTIONS = [
       "inflammation",
       "high blood pressure",
@@ -377,10 +418,61 @@
     let selectedTheme = "";
     let selectedConditions = [];
 
-    function setTheme(theme){
+    /************************************************************
+     * ZONE LOOKUP
+     ************************************************************/
+    async function fetchZoneByZip(zip) {
+      if (ZONE_OVERRIDES[zip]) {
+        return { ...ZONE_OVERRIDES[zip], source: "override" };
+      }
+
+      const url = `https://phzmapi.org/${zip}.json`;
+      const res = await fetch(url, { cache: "no-store" });
+
+      if (!res.ok) {
+        throw new Error("Zone service unavailable");
+      }
+
+      const data = await res.json();
+      const zone = (data.zone || data.hardiness_zone || data.zone_id || "").toString().trim();
+
+      if (!zone) {
+        throw new Error("Zone not found");
+      }
+
+      return {
+        zone,
+        city: (data.city || data.place || "").toString().trim(),
+        state: (data.state || data.state_abbr || "").toString().trim(),
+        note: "Zone detected from zone-by-zip dataset.",
+        source: "phzmapi"
+      };
+    }
+
+    function renderZoneOk(result, zip) {
+      const loc = [result.city, result.state].filter(Boolean).join(", ");
+
+      $("zoneCard").style.display = "block";
+      $("zoneTitle").textContent = `Detected USDA Zone ${result.zone}`;
+      $("zoneDetails").textContent = loc ? `${loc} • ZIP ${zip}` : `ZIP ${zip}`;
+      $("zoneNote").textContent = result.note || "";
+      $("statusText").textContent = `Status: Zone found (${result.zone}). Pick a theme.`;
+    }
+
+    function renderZoneError(message) {
+      $("zoneCard").style.display = "block";
+      $("zoneTitle").textContent = "Unable to detect USDA zone";
+      $("zoneDetails").textContent = message;
+      $("zoneNote").textContent = "Double-check your ZIP and try again.";
+      $("statusText").textContent = "Status: Zone detection failed.";
+    }
+
+    /************************************************************
+     * THEMES + CONDITIONS
+     ************************************************************/
+    function setTheme(theme) {
       selectedTheme = theme;
 
-      // Toggle pill UI
       document.querySelectorAll("#themeRow .pill").forEach(btn => {
         btn.setAttribute("aria-pressed", btn.dataset.theme === theme ? "true" : "false");
       });
@@ -388,16 +480,18 @@
       $("themeCard").style.display = "block";
       $("themeText").textContent = theme;
 
-      // Show conditions only for Functional Food
       const showConditions = theme === "Functional Food";
       $("conditionsCard").style.display = showConditions ? "block" : "none";
+
       if (!showConditions) {
         selectedConditions = [];
         renderSelectedConditions();
       }
+
+      updatePreferenceSummary();
     }
 
-    function renderSuggestions(filterText){
+    function renderSuggestions(filterText) {
       const row = $("suggestionsRow");
       row.innerHTML = "";
 
@@ -416,7 +510,7 @@
       });
     }
 
-    function renderSelectedConditions(){
+    function renderSelectedConditions() {
       const row = $("selectedConditionsRow");
       row.innerHTML = "";
 
@@ -438,64 +532,128 @@
         chip.addEventListener("click", () => {
           selectedConditions = selectedConditions.filter(x => x !== c);
           renderSelectedConditions();
+          updatePreferenceSummary();
         });
         row.appendChild(chip);
       });
     }
 
-    function addCondition(text){
+    function addCondition(text) {
       const c = (text || "").trim();
       if (!c) return;
-      if (!selectedConditions.includes(c)) selectedConditions.push(c);
+
+      if (!selectedConditions.includes(c)) {
+        selectedConditions.push(c);
+      }
+
       $("conditionInput").value = "";
       renderSuggestions("");
       renderSelectedConditions();
+      updatePreferenceSummary();
     }
 
     /************************************************************
-     * AI GENERATION
-     * This HTML calls your proxy. Your proxy should:
-     * - accept POST JSON
-     * - return { text: "..." }
+     * PREFERENCES
      ************************************************************/
-    function buildUserPrompt(){
+    function getPreferenceState() {
+      return {
+        nativeOnly: $("nativeOnlyCheckbox").checked,
+        holisticHealing: $("holisticHealingCheckbox").checked
+      };
+    }
+
+    function updatePreferenceSummary() {
+      const summary = $("preferenceSummary");
+      const { nativeOnly, holisticHealing } = getPreferenceState();
+      const items = [];
+
+      if (selectedTheme) {
+        items.push(`Theme: ${selectedTheme}`);
+      }
+
+      if (nativeOnly) {
+        items.push("Only native plants for this zone");
+      } else {
+        items.push("Native plants preferred when practical, but not required");
+      }
+
+      if (holisticHealing) {
+        items.push("Include holistic healing powers / traditional uses");
+      } else {
+        items.push("Focus on planting plan without healing-power details");
+      }
+
+      if (selectedTheme === "Functional Food") {
+        if (selectedConditions.length) {
+          items.push(`Functional focus: ${selectedConditions.join(", ")}`);
+        } else {
+          items.push("Functional focus: general wellness");
+        }
+      }
+
+      summary.innerHTML = items.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+      $("preferenceCard").style.display = "block";
+    }
+
+    /************************************************************
+     * AI PROMPT
+     ************************************************************/
+    function buildUserPrompt() {
       const zip = detected.zip || cleanZip($("zipInput").value);
       const zone = detected.zone || "";
+      const locationLine = detected.location ? `Location: ${detected.location}.` : "";
+      const { nativeOnly, holisticHealing } = getPreferenceState();
+
+      let rules = [
+        `Create a small home garden plan for ZIP ${zip} in USDA hardiness zone ${zone}.`,
+        locationLine,
+        `Theme: ${selectedTheme}.`
+      ].filter(Boolean);
+
+      if (nativeOnly) {
+        rules.push("Use only native plants that fit this USDA zone.");
+      } else {
+        rules.push("Prefer native or well-adapted plants when practical.");
+      }
+
+      if (holisticHealing) {
+        rules.push("For each plant, include its traditional holistic use or 'power' using cautious wording such as 'traditionally used for...' and avoid medical claims.");
+      } else {
+        rules.push("Do not emphasize medicinal or healing properties unless they are briefly relevant.");
+      }
 
       if (selectedTheme === "Functional Food") {
         const cond = selectedConditions.length ? selectedConditions.join(", ") : "general wellness";
-        return `Create a small home garden plan for ZIP ${zip} in USDA hardiness zone ${zone}.
-Theme: Functional Food.
-User conditions / goals: ${cond}.
-
-Rules:
-- Prefer native or well-adapted plants when possible.
-- Include edible/usable plants with practical notes (what part is used, how to harvest, how to prepare).
-- Provide a simple layout (small yard / raised bed / containers).
-- Provide seasonal tasks and maintenance.
-- Provide 5 easy recipe ideas using the suggested plants.
-- Include a short safety note: this is not medical advice.`;
+        rules.push(`User conditions / goals: ${cond}.`);
+        rules.push("Include edible or usable plants with practical notes about what part is used, how to harvest, and how to prepare.");
+        rules.push("Provide a simple layout for a small yard, raised bed, or containers.");
+        rules.push("Provide seasonal tasks and maintenance.");
+        rules.push("Provide 5 easy recipe or use ideas using the suggested plants.");
+        rules.push("End with a short safety note that this is not medical advice.");
+      } else if (selectedTheme === "Pollinator Paradise") {
+        rules.push("Focus on pollinator support, bloom succession, biodiversity, and simple maintenance.");
+        rules.push("Include a simple layout, bloom timing, and beginner tips.");
+      } else if (selectedTheme === "Low-Maintenance Beauty") {
+        rules.push("Focus on visually appealing, easy-care plants with low-maintenance planning.");
+        rules.push("Include a simple layout, seasonal interest, and beginner tips.");
       }
 
-      return `Create a small home garden plan for ZIP ${zip} in USDA hardiness zone ${zone}.
-Theme: ${selectedTheme}.
-Include:
-- Plant list (with brief reasons)
-- Simple layout
-- Seasonal tasks and maintenance
-- Tips for beginners.`;
+      rules.push("Format the answer with clear sections and bullet points where helpful.");
+      return rules.join("\n");
     }
 
-    async function callAIProxy(payload){
+    async function callAIProxy(payload) {
       const resp = await fetch(AI_PROXY_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
+
       if (!resp.ok) {
         const t = await resp.text().catch(() => "");
         throw new Error(`AI request failed (${resp.status}). ${t}`.trim());
       }
+
       return await resp.json();
     }
 
@@ -517,8 +675,9 @@ Include:
       try {
         const result = await fetchZoneByZip(zip);
 
-        // sanity check
-        if (!/^\d{1,2}[ab]?$/.test(result.zone)) throw new Error("Invalid zone format");
+        if (!/^\d{1,2}[ab]?$/.test(result.zone)) {
+          throw new Error("Invalid zone format");
+        }
 
         detected.zip = zip;
         detected.zone = result.zone;
@@ -534,7 +693,9 @@ Include:
     });
 
     $("zipInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") $("detectBtn").click();
+      if (e.key === "Enter") {
+        $("detectBtn").click();
+      }
     });
 
     $("resetBtn").addEventListener("click", () => {
@@ -542,17 +703,22 @@ Include:
       $("zoneCard").style.display = "none";
       $("themeCard").style.display = "none";
       $("conditionsCard").style.display = "none";
+      $("preferenceCard").style.display = "none";
       $("statusText").textContent = "Status: Enter a ZIP and click Detect Zone.";
 
       detected = { zip: "", zone: "", location: "" };
       selectedTheme = "";
       selectedConditions = [];
 
-      document.querySelectorAll("#themeRow .pill").forEach(btn => btn.setAttribute("aria-pressed","false"));
+      $("nativeOnlyCheckbox").checked = false;
+      $("holisticHealingCheckbox").checked = false;
+
+      document.querySelectorAll("#themeRow .pill").forEach(btn => btn.setAttribute("aria-pressed", "false"));
 
       $("conditionInput").value = "";
       $("suggestionsRow").innerHTML = "";
       $("selectedConditionsRow").innerHTML = "";
+      $("preferenceSummary").innerHTML = "";
 
       $("aiStatus").textContent = "";
       $("aiOutput").style.display = "none";
@@ -568,16 +734,20 @@ Include:
     });
 
     $("conditionInput").addEventListener("input", (e) => renderSuggestions(e.target.value));
+
     $("conditionInput").addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
         addCondition($("conditionInput").value);
       }
     });
+
     $("addConditionBtn").addEventListener("click", () => addCondition($("conditionInput").value));
 
+    $("nativeOnlyCheckbox").addEventListener("change", updatePreferenceSummary);
+    $("holisticHealingCheckbox").addEventListener("change", updatePreferenceSummary);
+
     $("generateBtn").addEventListener("click", async () => {
-      // Reset output UI
       $("aiOutput").style.display = "none";
       $("aiOutput").textContent = "";
       $("copyBtn").style.display = "none";
@@ -587,24 +757,28 @@ Include:
         $("aiStatus").textContent = "Enter a valid ZIP first, then Detect Zone.";
         return;
       }
+
       if (!detected.zone) {
         $("aiStatus").textContent = "Click Detect Zone first.";
         return;
       }
+
       if (!selectedTheme) {
         $("aiStatus").textContent = "Pick a theme first.";
         return;
       }
-      if (AI_PROXY_URL.includes("YOUR-PROXY-DOMAIN")) {
-        $("aiStatus").textContent = "Set AI_PROXY_URL in the code first (search for AI_PROXY_URL).";
+
+      if (!AI_PROXY_URL || !AI_PROXY_URL.startsWith("https://")) {
+        $("aiStatus").textContent = "Set AI_PROXY_URL in the code first.";
         return;
       }
 
+      const { nativeOnly, holisticHealing } = getPreferenceState();
       const prompt = buildUserPrompt();
 
-      $("aiStatus").textContent = "Generating…";
+      $("aiStatus").textContent = "Generating...";
       $("generateBtn").disabled = true;
-      $("generateBtn").textContent = "Working…";
+      $("generateBtn").textContent = "Working...";
 
       try {
         const data = await callAIProxy({
@@ -612,7 +786,9 @@ Include:
           zone: detected.zone,
           location: detected.location,
           theme: selectedTheme,
-          conditions: (selectedTheme === "Functional Food") ? selectedConditions : [],
+          nativeOnly,
+          holisticHealing,
+          conditions: selectedTheme === "Functional Food" ? selectedConditions : [],
           prompt
         });
 
@@ -622,7 +798,8 @@ Include:
         $("aiStatus").textContent = "Done.";
         $("copyBtn").style.display = "inline-block";
       } catch (e) {
-        $("aiStatus").textContent = "AI failed. Check your proxy URL + CORS, then try again.";
+        console.error(e);
+        $("aiStatus").textContent = "AI failed. Check your proxy URL, Vercel deploy, and CORS settings, then try again.";
       } finally {
         $("generateBtn").disabled = false;
         $("generateBtn").textContent = "Generate Plan";
@@ -634,13 +811,17 @@ Include:
       try {
         await navigator.clipboard.writeText(text);
         $("aiStatus").textContent = "Copied.";
-        setTimeout(() => { $("aiStatus").textContent = "Done."; }, 900);
+        setTimeout(() => {
+          $("aiStatus").textContent = "Done.";
+        }, 900);
       } catch (e) {
-        $("aiStatus").textContent = "Copy failed (browser blocked it). You can manually select + copy.";
+        $("aiStatus").textContent = "Copy failed. You can manually select and copy.";
       }
     });
 
-    // Initial render
+    /************************************************************
+     * INITIAL RENDER
+     ************************************************************/
     renderSuggestions("");
     renderSelectedConditions();
   </script>
